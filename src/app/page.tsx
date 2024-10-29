@@ -1,83 +1,114 @@
-import Image from 'next/image';
+import { useForm } from 'react-hook-form';
+import axios from 'axios';
+import { useState } from 'react';
+import QRCode from 'qrcode.react';
+import { CheckCircle, Mail, Phone, User, Globe } from 'lucide-react'; // 引入所需的圖標
 
 export default function Home() {
-    return (
-        <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-            <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-                <Image
-                    className="dark:invert"
-                    src="/next.svg"
-                    alt="Next.js logo"
-                    width={180}
-                    height={38}
-                    priority
-                />
-                <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-                    <li className="mb-2">
-                        Get started by editing{' '}
-                        <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-                            src/app/page.tsx
-                        </code>
-                        .
-                    </li>
-                    <li>Save and see your changes instantly.</li>
-                </ol>
+    const {
+        register,
+        handleSubmit,
+        formState: { errors }
+    } = useForm();
+    const [qrCode, setQrCode] = useState(null);
+    const [formId, setFormId] = useState(null);
 
-                <div className="flex gap-4 items-center flex-col sm:flex-row">
-                    <a
-                        className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-                        href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        <Image
-                            className="dark:invert"
-                            src="/vercel.svg"
-                            alt="Vercel logomark"
-                            width={20}
-                            height={20}
+    const onSubmit = async (data) => {
+        try {
+            // 假設您已經有一個表單 ID
+            const formId = 'YOUR_FORM_ID'; // 替換為實際表單 ID
+            const response = await axios.post(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/forms/${formId}/submissions`,
+                { form_submission: { submission_data: data } }
+            );
+            setQrCode(response.data.qrcode_id);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    return (
+        <div className="container mx-auto p-4">
+            <h1 className="text-2xl font-bold mb-4">活動報名表</h1>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div>
+                    <label className="block text-sm font-medium mb-1">
+                        姓名 <span className="text-red-500">*</span>
+                    </label>
+                    <div className="flex items-center border rounded">
+                        <User className="w-5 h-5 text-gray-400 ml-2" />
+                        <input
+                            name="name"
+                            {...register('name', { required: true })}
+                            className="flex-1 p-2 focus:outline-none"
+                            placeholder="您的姓名"
                         />
-                        Deploy now
-                    </a>
-                    <a
-                        className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-                        href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Read our docs
-                    </a>
+                    </div>
+                    {errors.name && <span className="text-red-500 text-sm">這是必填欄位</span>}
                 </div>
-            </main>
-            <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-                <a
-                    className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-                    href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-                    target="_blank"
-                    rel="noopener noreferrer"
+
+                <div>
+                    <label className="block text-sm font-medium mb-1">
+                        電子郵件 <span className="text-red-500">*</span>
+                    </label>
+                    <div className="flex items-center border rounded">
+                        <Mail className="w-5 h-5 text-gray-400 ml-2" />
+                        <input
+                            name="email"
+                            type="email"
+                            {...register('email', { required: true })}
+                            className="flex-1 p-2 focus:outline-none"
+                            placeholder="您的電子郵件"
+                        />
+                    </div>
+                    {errors.email && <span className="text-red-500 text-sm">這是必填欄位</span>}
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium mb-1">電話號碼</label>
+                    <div className="flex items-center border rounded">
+                        <Phone className="w-5 h-5 text-gray-400 ml-2" />
+                        <input
+                            name="phone_number"
+                            {...register('phone_number')}
+                            className="flex-1 p-2 focus:outline-none"
+                            placeholder="您的電話號碼"
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium mb-1">國家</label>
+                    <div className="flex items-center border rounded">
+                        <Globe className="w-5 h-5 text-gray-400 ml-2" />
+                        <select
+                            name="country"
+                            {...register('country')}
+                            className="flex-1 p-2 focus:outline-none"
+                            defaultValue="USA"
+                        >
+                            <option value="USA">USA</option>
+                            <option value="Canada">Canada</option>
+                            <option value="Others">Others</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button
+                    type="submit"
+                    className="flex items-center justify-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
                 >
-                    <Image aria-hidden src="/file.svg" alt="File icon" width={16} height={16} />
-                    Learn
-                </a>
-                <a
-                    className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-                    href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <Image aria-hidden src="/window.svg" alt="Window icon" width={16} height={16} />
-                    Examples
-                </a>
-                <a
-                    className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-                    href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <Image aria-hidden src="/globe.svg" alt="Globe icon" width={16} height={16} />
-                    Go to nextjs.org →
-                </a>
-            </footer>
+                    提交 <CheckCircle className="w-5 h-5 ml-2" />
+                </button>
+            </form>
+
+            {qrCode && (
+                <div className="mt-8 text-center">
+                    <h2 className="text-xl font-semibold mb-2">您的電子門票 QR Code</h2>
+                    <QRCode value={qrCode} size={256} />
+                    <p className="mt-2">QR Code ID: {qrCode}</p>
+                </div>
+            )}
         </div>
     );
 }
