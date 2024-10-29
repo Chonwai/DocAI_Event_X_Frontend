@@ -1,7 +1,7 @@
 declare module 'qrcode.react' {
     import { Component } from 'react';
 
-    interface QRCodeProps {
+    interface QRCodeCanvasProps {
         value: string;
         size?: number;
         bgColor?: string;
@@ -11,5 +11,6 @@ declare module 'qrcode.react' {
         includeMargin?: boolean;
     }
 
-    export default class QRCode extends Component<QRCodeProps> {}
+    export class QRCodeCanvas extends Component<QRCodeCanvasProps> {}
+    export class QRCodeSVG extends Component<QRCodeCanvasProps> {}
 }

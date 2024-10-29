@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { User, List, BarChart2, LogOut } from 'lucide-react';

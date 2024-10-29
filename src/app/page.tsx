@@ -1,7 +1,9 @@
+'use client';
+
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { useState } from 'react';
-import QRCode from 'qrcode.react';
+import { QRCodeCanvas } from 'qrcode.react';
 import { CheckCircle, Mail, Phone, User, Globe } from 'lucide-react'; // 引入所需的圖標
 
 export default function Home() {
@@ -105,7 +107,7 @@ export default function Home() {
             {qrCode && (
                 <div className="mt-8 text-center">
                     <h2 className="text-xl font-semibold mb-2">您的電子門票 QR Code</h2>
-                    <QRCode value={qrCode} size={256} />
+                    <QRCodeCanvas value={qrCode} size={256} />
                     <p className="mt-2">QR Code ID: {qrCode}</p>
                 </div>
             )}
