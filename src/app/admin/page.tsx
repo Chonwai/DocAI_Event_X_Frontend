@@ -2,16 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { User, List, BarChart2, LogOut } from 'lucide-react';
+import { User, List, BarChart2, LogOut, CheckCircle } from 'lucide-react';
+import { Submission } from '../../types/submission'; // 根據實際路徑調整
 
 export default function Admin() {
-    const [submissions, setSubmissions] = useState([]);
+    const [submissions, setSubmissions] = useState<Submission[]>([]);
 
     useEffect(() => {
         // 假設您已經有一個表單 ID
         const formId = 'YOUR_FORM_ID'; // 替換為實際表單 ID
         axios
-            .get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/forms/${formId}/submissions`)
+            .get<Submission[]>(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/forms/${formId}/submissions`
+            )
             .then((response) => {
                 setSubmissions(response.data);
             })

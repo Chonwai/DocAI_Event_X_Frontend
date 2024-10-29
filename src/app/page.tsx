@@ -15,7 +15,7 @@ export default function Home() {
     const [qrCode, setQrCode] = useState(null);
     const [formId, setFormId] = useState(null);
 
-    const onSubmit = async (data) => {
+    const onSubmit = async (data: any) => {
         try {
             // 假設您已經有一個表單 ID
             const formId = 'YOUR_FORM_ID'; // 替換為實際表單 ID
@@ -40,7 +40,6 @@ export default function Home() {
                     <div className="flex items-center border rounded">
                         <User className="w-5 h-5 text-gray-400 ml-2" />
                         <input
-                            name="name"
                             {...register('name', { required: true })}
                             className="flex-1 p-2 focus:outline-none"
                             placeholder="您的姓名"
@@ -56,7 +55,6 @@ export default function Home() {
                     <div className="flex items-center border rounded">
                         <Mail className="w-5 h-5 text-gray-400 ml-2" />
                         <input
-                            name="email"
                             type="email"
                             {...register('email', { required: true })}
                             className="flex-1 p-2 focus:outline-none"
@@ -71,7 +69,6 @@ export default function Home() {
                     <div className="flex items-center border rounded">
                         <Phone className="w-5 h-5 text-gray-400 ml-2" />
                         <input
-                            name="phone_number"
                             {...register('phone_number')}
                             className="flex-1 p-2 focus:outline-none"
                             placeholder="您的電話號碼"
@@ -84,7 +81,6 @@ export default function Home() {
                     <div className="flex items-center border rounded">
                         <Globe className="w-5 h-5 text-gray-400 ml-2" />
                         <select
-                            name="country"
                             {...register('country')}
                             className="flex-1 p-2 focus:outline-none"
                             defaultValue="USA"
