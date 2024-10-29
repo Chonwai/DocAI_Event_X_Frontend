@@ -1,27 +1,52 @@
+// pages/admin/page.tsx
+
 'use client';
 
-import { useState, useEffect } from 'react';
+import { User, List, BarChart2, CheckCircle } from 'lucide-react';
 import axios from 'axios';
-import { User, List, BarChart2, LogOut, CheckCircle } from 'lucide-react';
-import { Submission } from '../../types/submission'; // 根據實際路徑調整
+import { useEffect, useState } from 'react';
 
-export default function Admin() {
+interface Submission {
+    qrcode_id: string;
+    submission_data: {
+        name: string;
+        email: string;
+        phone_number: string;
+        country: string;
+    };
+    checked_in: boolean;
+}
+
+const AdminDashboard: React.FC = () => {
     const [submissions, setSubmissions] = useState<Submission[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        // 假設您已經有一個表單 ID
-        const formId = 'YOUR_FORM_ID'; // 替換為實際表單 ID
-        axios
-            .get<Submission[]>(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/forms/${formId}/submissions`
-            )
-            .then((response) => {
+        const fetchSubmissions = async () => {
+            try {
+                const formId = process.env.NEXT_PUBLIC_FORM_ID; // 設置您的表單 ID
+                const response = await axios.get(
+                    `${process.env.NEXT_PUBLIC_API_BASE_URL}/forms/${formId}/submissions`
+                );
                 setSubmissions(response.data);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+            } catch (err: any) {
+                setError('無法獲取報名者信息。');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchSubmissions();
     }, []);
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div className="text-red-500">{error}</div>;
+    }
 
     return (
         <div className="container mx-auto p-4">
@@ -30,12 +55,6 @@ export default function Admin() {
             </h1>
 
             <div className="mb-4">
-                <button className="flex items-center bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">
-                    <LogOut className="w-5 h-5 mr-2" /> 登出
-                </button>
-            </div>
-
-            <div className="mb-6">
                 <h2 className="text-xl font-semibold flex items-center">
                     <User className="w-6 h-6 mr-2" /> 報名者列表
                 </h2>
@@ -83,8 +102,10 @@ export default function Admin() {
                 <h2 className="text-xl font-semibold flex items-center">
                     <BarChart2 className="w-6 h-6 mr-2" /> 統計數據
                 </h2>
-                {/* 這裡可以集成圖表庫來展示統計數據 */}
+                {/* 集成圖表庫來展示統計數據 */}
             </div>
         </div>
     );
-}
+};
+
+export default AdminDashboard;
