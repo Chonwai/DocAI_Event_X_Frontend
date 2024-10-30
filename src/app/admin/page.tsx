@@ -43,7 +43,7 @@ const AdminDashboard: React.FC = () => {
     }
 
     const handleClickForm = (formData: any) => {
-        router.push(`/admin/forms/${formData?.id}`)
+        router.push(`/admin/form_submissions/${formData?.id}`)
     }
 
     if (loading) {
@@ -52,6 +52,7 @@ const AdminDashboard: React.FC = () => {
 
     return (
         <div className="container mx-auto p-4">
+            <h1 className="text-2xl font-bold mb-4">{'表單列表'}</h1>
             {formDatas?.map((data, index: number) => (
                 <div key={index} className='flex flex-col mb-4'>
                     <div
