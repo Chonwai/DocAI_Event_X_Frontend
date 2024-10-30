@@ -1,112 +1,45 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
 import axios from 'axios';
-import { useState } from 'react';
-import { QRCodeCanvas } from 'qrcode.react';
-import { CheckCircle, Mail, Phone, User, Globe } from 'lucide-react'; // 引入所需的圖標
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
-    const {
-        register,
-        handleSubmit,
-        formState: { errors }
-    } = useForm();
-    const [qrCode, setQrCode] = useState(null);
-    const [formId, setFormId] = useState(null);
+    const router = useRouter()
+    const [formDatas, setFormDatas] = useState<any[]>([])
 
-    const onSubmit = async (data: any) => {
-        try {
-            // 假設您已經有一個表單 ID
-            const formId = 'YOUR_FORM_ID'; // 替換為實際表單 ID
-            const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/forms/${formId}/submissions`,
-                { form_submission: { submission_data: data } }
-            );
-            setQrCode(response.data.qrcode_id);
-        } catch (error) {
-            console.error(error);
+    useEffect(() => {
+        loadAllFormData()
+    }, [])
+
+    const loadAllFormData = async () => {
+        const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/forms`
+        );
+        console.log('response.data', response.data);
+        if (response.data.success) {
+            setFormDatas(response.data.forms)
+        } else {
+            alert(response.data.error?.toString() || 'error')
         }
-    };
+    }
+
+    const handleClickForm = (formData: any) => {
+        router.push(`/forms/${formData?.id}`)
+    }
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">活動報名表</h1>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <div>
-                    <label className="block text-sm font-medium mb-1">
-                        姓名 <span className="text-red-500">*</span>
-                    </label>
-                    <div className="flex items-center border rounded">
-                        <User className="w-5 h-5 text-gray-400 ml-2" />
-                        <input
-                            {...register('name', { required: true })}
-                            className="flex-1 p-2 focus:outline-none"
-                            placeholder="您的姓名"
-                        />
-                    </div>
-                    {errors.name && <span className="text-red-500 text-sm">這是必填欄位</span>}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium mb-1">
-                        電子郵件 <span className="text-red-500">*</span>
-                    </label>
-                    <div className="flex items-center border rounded">
-                        <Mail className="w-5 h-5 text-gray-400 ml-2" />
-                        <input
-                            type="email"
-                            {...register('email', { required: true })}
-                            className="flex-1 p-2 focus:outline-none"
-                            placeholder="您的電子郵件"
-                        />
-                    </div>
-                    {errors.email && <span className="text-red-500 text-sm">這是必填欄位</span>}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium mb-1">電話號碼</label>
-                    <div className="flex items-center border rounded">
-                        <Phone className="w-5 h-5 text-gray-400 ml-2" />
-                        <input
-                            {...register('phone_number')}
-                            className="flex-1 p-2 focus:outline-none"
-                            placeholder="您的電話號碼"
-                        />
+            {formDatas?.map((data, index: number) => (
+                <div key={index} className='flex flex-col mb-4'>
+                    <div
+                        onClick={() => { handleClickForm(data) }}
+                        className='cursor-pointer p-2 border border-gray-200 rounded hover:bg-gray-100'
+                    >
+                        <label className='font-semibold'>{data?.json_schema?.title}</label>
                     </div>
                 </div>
-
-                <div>
-                    <label className="block text-sm font-medium mb-1">國家</label>
-                    <div className="flex items-center border rounded">
-                        <Globe className="w-5 h-5 text-gray-400 ml-2" />
-                        <select
-                            {...register('country')}
-                            className="flex-1 p-2 focus:outline-none"
-                            defaultValue="USA"
-                        >
-                            <option value="USA">USA</option>
-                            <option value="Canada">Canada</option>
-                            <option value="Others">Others</option>
-                        </select>
-                    </div>
-                </div>
-
-                <button
-                    type="submit"
-                    className="flex items-center justify-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
-                >
-                    提交 <CheckCircle className="w-5 h-5 ml-2" />
-                </button>
-            </form>
-
-            {qrCode && (
-                <div className="mt-8 text-center">
-                    <h2 className="text-xl font-semibold mb-2">您的電子門票 QR Code</h2>
-                    <QRCodeCanvas value={qrCode} size={256} />
-                    <p className="mt-2">QR Code ID: {qrCode}</p>
-                </div>
-            )}
+            ))}
         </div>
     );
 }
