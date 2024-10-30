@@ -41,17 +41,23 @@ export default function Home() {
     }
 
     return (
-        <div className="container mx-auto p-4">
-            {formDatas?.map((data, index: number) => (
-                <div key={index} className='flex flex-col mb-4'>
-                    <div
-                        onClick={() => { handleClickForm(data) }}
-                        className='cursor-pointer p-2 border border-gray-200 rounded hover:bg-gray-100'
-                    >
-                        <label className='font-semibold'>{data?.json_schema?.title}</label>
+        <>
+            {/* 默认显示form id */}
+            {/* <FormDetail /> */}
+
+            {/* 显示form list */}
+            <div className="container mx-auto p-4">
+                {formDatas?.map((data, index: number) => (
+                    <div key={index} className='flex flex-col mb-4'>
+                        <div
+                            onClick={() => { handleClickForm(data) }}
+                            className='cursor-pointer p-2 border border-gray-200 rounded hover:bg-gray-100'
+                        >
+                            <label className='font-semibold'>{data?.json_schema?.title}</label>
+                        </div>
                     </div>
-                </div>
-            ))}
-        </div>
+                ))}
+            </div>
+        </>
     );
 }
