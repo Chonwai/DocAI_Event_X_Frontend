@@ -3,16 +3,28 @@
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+export interface EventForm {
+    id: string;
+    name: string;
+    description: string;
+    json_schema: {
+        type: string;
+        title: string;
+        properties: any;
+        dependencies: any
+    }
+}
+
 
 export default function Home() {
     const router = useRouter()
-    const [formDatas, setFormDatas] = useState<any[]>([])
+    const [formDatas, setFormDatas] = useState<EventForm[]>([])
 
     useEffect(() => {
-        loadAllFormData()
+        fetchAllFormData()
     }, [])
 
-    const loadAllFormData = async () => {
+    const fetchAllFormData = async () => {
         const response = await axios.get(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/forms`
         );

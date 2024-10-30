@@ -6,7 +6,22 @@ import { QRCodeCanvas } from 'qrcode.react';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-export default function Home() {
+export interface FormDetail {
+    id: string;
+    name: string;
+    description: string;
+    json_schema: {
+        type: string;
+        title: string;
+        properties: any;
+        dependencies: any
+    },
+    form_data: any;
+    ui_schema: any;
+
+}
+
+export default function FormDetail() {
     const {
         register,
         handleSubmit,
@@ -17,15 +32,15 @@ export default function Home() {
     const params = useParams()
     const [qrCode, setQrCode] = useState(null);
     const [formId, setFormId] = useState(null);
-    const [formData, setFormData] = useState<any>()
+    const [formData, setFormData] = useState<FormDetail>()
     const [loading, setLoading] = useState<boolean>(true);
     const [submitting, setSubmitting] = useState<boolean>(false);
 
     useEffect(() => {
-        loadFormDataById()
+        fetchFormDataById()
     }, [params])
 
-    const loadFormDataById = async () => {
+    const fetchFormDataById = async () => {
         console.log('form id', params['id']);
         setLoading(true)
         const formId = params['id']//'98d9afbe-4b7f-492d-ad0b-9d2a4e95b262'
@@ -61,6 +76,10 @@ export default function Home() {
     };
 
     if (loading) {
+        return <div className="text-center mt-10">Loading...</div>;
+    }
+
+    if (!formData) {
         return <div className="text-center mt-10">Loading...</div>;
     }
 
@@ -135,7 +154,7 @@ export default function Home() {
                                         )}
                                     />
                                 )}
-                                {errors[key] && <span className="text-red-500 text-sm mt-1">{String(errors[key].message)}</span>}
+                                {errors[key] && <span className="text-red-500 text-sm mt-1">{errors[key]?.message + ""}</span>}
                             </div>
                         );
                     })}
