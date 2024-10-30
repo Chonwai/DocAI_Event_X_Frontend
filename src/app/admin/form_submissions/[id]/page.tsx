@@ -28,7 +28,7 @@ const AdminDashboard: React.FC = () => {
             try {
                 const formId = params['id'] || process.env.NEXT_PUBLIC_FORM_ID; // 設置您的表單 ID
                 const response = await axios.get(
-                    `${process.env.NEXT_PUBLIC_API_BASE_URL}/form_submissions/${formId}`
+                    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/form_submissions/${formId}`
                 );
                 setSubmissions(response.data);
             } catch (err: any) {

@@ -43,7 +43,7 @@ export default function FormDetail() {
         console.log('form id', params['id']);
         setLoading(true);
         const formId = params['id'] || process.env.NEXT_PUBLIC_FORM_ID; //'98d9afbe-4b7f-492d-ad0b-9d2a4e95b262'
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/forms/${formId}`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/forms/${formId}`);
         setLoading(false);
         console.log('response.data', response.data);
         if (response.data.success) {
@@ -60,7 +60,7 @@ export default function FormDetail() {
             // 假設您已經有一個表單 ID
             const formId = params['id'] || process.env.NEXT_PUBLIC_FORM_ID; // 替換為實際表單 ID
             const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/form_submissions`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/form_submissions`,
                 { form_submission: { form_id: formId, submission_data: data } }
             );
             setSubmitting(false);

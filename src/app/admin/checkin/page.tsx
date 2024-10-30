@@ -21,7 +21,7 @@ const CheckIn: React.FC = () => {
             setScanResult(data);
             try {
                 const response = await axios.patch(
-                    `${process.env.NEXT_PUBLIC_API_BASE_URL}/form_submissions/${data}/check_in`
+                    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/form_submissions/${data}/check_in`
                 );
                 setCheckInStatus({ success: true, message: response.data.message });
             } catch (err: any) {

@@ -24,7 +24,7 @@ export default function Home() {
     }, []);
 
     const fetchAllFormData = async () => {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/forms`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/forms`);
         console.log('response.data', response.data);
         if (response.data.success) {
             setFormDatas(response.data.forms);
