@@ -2,8 +2,6 @@
 
 import localFont from 'next/font/local';
 import './globals.css';
-import Navbar from '../components/Navbar';
-import { SessionProvider } from 'next-auth/react';
 import UserNavbar from '@/components/UserNavbar';
 
 const geistSans = localFont({
@@ -18,19 +16,15 @@ const geistMono = localFont({
 });
 
 export default function RootLayout({
-    children,
-    session
+    children
 }: Readonly<{
     children: React.ReactNode;
-    session: any;
 }>) {
     return (
         <html lang="en">
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-100`}>
-                <SessionProvider session={session}>
-                    <UserNavbar />
-                    {children}
-                </SessionProvider>
+                <UserNavbar />
+                {children}
             </body>
         </html>
     );

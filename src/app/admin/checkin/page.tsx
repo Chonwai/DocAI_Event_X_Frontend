@@ -3,11 +3,9 @@
 'use client';
 
 import { useState } from 'react';
-import dynamic from 'next/dynamic';
 import axios from 'axios';
 import { CheckCircle, XCircle } from 'lucide-react';
-
-const QrReader = dynamic(() => import('react-qr-reader'), { ssr: false });
+import { QrReader } from 'react-qr-reader';
 
 const CheckIn: React.FC = () => {
     const [scanResult, setScanResult] = useState<string | null>(null);
@@ -44,14 +42,14 @@ const CheckIn: React.FC = () => {
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">工作人員 Check-In 系統</h1>
 
-            <div className="mb-4">
+            {/* <div className="mb-4">
                 <QrReader
                     delay={300}
                     onError={handleError}
                     onScan={handleScan}
                     style={{ width: '100%' }}
                 />
-            </div>
+            </div> */}
 
             {error && (
                 <div className="flex items-center text-red-500 mb-4">
