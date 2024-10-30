@@ -14,11 +14,11 @@ const UserNavbar: React.FC = () => {
                 </Link>
                 {/* 添加更多普通用戶導航鏈接 */}
             </div>
-            <div className="flex items-center space-x-4">
+            {/* <div className="flex items-center space-x-4">
                 <Link legacyBehavior href="/auth/signin">
                     <a className="flex items-center hover:text-gray-400 transition">登錄</a>
                 </Link>
-            </div>
+            </div> */}
         </nav>
     );
 };

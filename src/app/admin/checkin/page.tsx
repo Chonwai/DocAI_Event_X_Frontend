@@ -3,13 +3,9 @@
 'use client';
 
 import { useState } from 'react';
-import dynamic from 'next/dynamic';
 import axios from 'axios';
 import { CheckCircle, XCircle } from 'lucide-react';
-
-const QrReader = dynamic(() => import('react-qr-reader').then((mod) => mod.QrReader), {
-    ssr: false
-});
+import { Scanner } from '@yudiel/react-qr-scanner';
 
 const CheckIn: React.FC = () => {
     const [scanResult, setScanResult] = useState<string | null>(null);
@@ -19,8 +15,9 @@ const CheckIn: React.FC = () => {
     } | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    const handleScan = async (data: string | null) => {
-        if (data) {
+    const handleScan = async (detectedCodes: DetectedBarcode[]) => {
+        if (detectedCodes && detectedCodes.length > 0) {
+            const data = detectedCodes[0].rawValue;
             setScanResult(data);
             try {
                 const response = await axios.patch(
@@ -37,7 +34,7 @@ const CheckIn: React.FC = () => {
         }
     };
 
-    const handleError = (err: any) => {
+    const handleError = (err: unknown) => {
         console.error(err);
         setError('無法訪問攝像頭。請確保您已授予攝像頭權限。');
     };
@@ -47,12 +44,7 @@ const CheckIn: React.FC = () => {
             <h1 className="text-2xl font-bold mb-4">工作人員 Check-In 系統</h1>
 
             <div className="mb-4">
-                <QrReader
-                    delay={300}
-                    onError={handleError}
-                    onScan={handleScan}
-                    style={{ width: '100%' }}
-                />
+                <Scanner onScan={handleScan} onError={handleError} />
             </div>
 
             {error && (
