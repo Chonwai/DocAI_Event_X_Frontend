@@ -41,11 +41,11 @@ const AdminDashboard: React.FC = () => {
     }, []);
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <div className="text-center mt-10">Loading...</div>;
     }
 
     if (error) {
-        return <div className="text-red-500">{error}</div>;
+        return <div className="text-red-500 text-center mt-10">{error}</div>;
     }
 
     return (
