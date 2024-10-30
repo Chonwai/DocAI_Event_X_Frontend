@@ -14,11 +14,10 @@ export interface FormDetail {
         type: string;
         title: string;
         properties: any;
-        dependencies: any
-    },
+        dependencies: any;
+    };
     form_data: any;
     ui_schema: any;
-
 }
 
 export default function FormDetail() {
@@ -28,38 +27,35 @@ export default function FormDetail() {
         control,
         formState: { errors }
     } = useForm();
-    const router = useRouter()
-    const params = useParams()
+    const router = useRouter();
+    const params = useParams();
     const [qrCode, setQrCode] = useState(null);
     const [formId, setFormId] = useState(null);
-    const [formData, setFormData] = useState<FormDetail>()
+    const [formData, setFormData] = useState<FormDetail>();
     const [loading, setLoading] = useState<boolean>(true);
     const [submitting, setSubmitting] = useState<boolean>(false);
 
     useEffect(() => {
-        fetchFormDataById()
-    }, [params])
+        fetchFormDataById();
+    }, [params]);
 
     const fetchFormDataById = async () => {
         console.log('form id', params['id']);
-        setLoading(true)
-        const formId = params['id'] || process.env.NEXT_PUBLIC_FORM_ID//'98d9afbe-4b7f-492d-ad0b-9d2a4e95b262'
-        const response = await axios.get(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/forms/${formId}`
-        );
-        setLoading(false)
+        setLoading(true);
+        const formId = params['id'] || process.env.NEXT_PUBLIC_FORM_ID; //'98d9afbe-4b7f-492d-ad0b-9d2a4e95b262'
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/forms/${formId}`);
+        setLoading(false);
         console.log('response.data', response.data);
         if (response.data.success) {
-            setFormData(response.data.form)
+            setFormData(response.data.form);
         } else {
-            alert(response.data.error?.toString() || 'error')
+            alert(response.data.error?.toString() || 'error');
         }
-
-    }
+    };
 
     const onSubmit = async (data: any) => {
         console.log('submit form data', data);
-        setSubmitting(true)
+        setSubmitting(true);
         try {
             // 假設您已經有一個表單 ID
             const formId = params['id'] || process.env.NEXT_PUBLIC_FORM_ID; // 替換為實際表單 ID
@@ -67,10 +63,10 @@ export default function FormDetail() {
                 `${process.env.NEXT_PUBLIC_API_BASE_URL}/form_submissions`,
                 { form_submission: { form_id: formId, submission_data: data } }
             );
-            setSubmitting(false)
+            setSubmitting(false);
             setQrCode(response.data.form_submission.qrcode_id);
         } catch (error) {
-            setSubmitting(false)
+            setSubmitting(false);
             console.error(error);
         }
     };
@@ -95,7 +91,8 @@ export default function FormDetail() {
                         return (
                             <div key={key} className="flex flex-col">
                                 <label className="font-medium mb-1">{fieldSchema.title}</label>
-                                {fieldSchema.type === 'string' && uiSchema?.['ui:widget'] === 'select' ? (
+                                {fieldSchema.type === 'string' &&
+                                uiSchema?.['ui:widget'] === 'select' ? (
                                     // 处理下拉选择框
                                     <Controller
                                         name={key}
@@ -111,7 +108,8 @@ export default function FormDetail() {
                                             </select>
                                         )}
                                     />
-                                ) : fieldSchema.type === 'array' && uiSchema?.['ui:widget'] === 'checkboxes' ? (
+                                ) : fieldSchema.type === 'array' &&
+                                  uiSchema?.['ui:widget'] === 'checkboxes' ? (
                                     // 处理复选框
                                     <Controller
                                         name={key}
@@ -128,7 +126,9 @@ export default function FormDetail() {
                                                             onChange={(e) => {
                                                                 const newValue = e.target.checked
                                                                     ? [...field.value, item]
-                                                                    : field.value.filter((v: string) => v !== item);
+                                                                    : field.value.filter(
+                                                                          (v: string) => v !== item
+                                                                      );
                                                                 field.onChange(newValue);
                                                             }}
                                                             className="mr-2"
@@ -154,15 +154,20 @@ export default function FormDetail() {
                                         )}
                                     />
                                 )}
-                                {errors[key] && <span className="text-red-500 text-sm mt-1">{errors[key]?.message + ""}</span>}
+                                {errors[key] && (
+                                    <span className="text-red-500 text-sm mt-1">
+                                        {errors[key]?.message + ''}
+                                    </span>
+                                )}
                             </div>
                         );
                     })}
-                    <div className='flex  justify-end'>
+                    <div className="flex  justify-end">
                         <button
                             type="submit"
                             disabled={submitting} // 禁用按钮
-                            className={`bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                            className={`bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
                             {submitting ? '提交中...' : '提交'}
                         </button>
                     </div>

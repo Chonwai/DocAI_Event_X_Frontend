@@ -22,7 +22,7 @@ const AdminDashboard: React.FC = () => {
     const [submissions, setSubmissions] = useState<Submission[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const params = useParams()
+    const params = useParams();
     useEffect(() => {
         const fetchSubmissions = async () => {
             try {

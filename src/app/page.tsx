@@ -11,49 +11,44 @@ export interface EventForm {
         type: string;
         title: string;
         properties: any;
-        dependencies: any
-    }
+        dependencies: any;
+    };
 }
 
-
 export default function Home() {
-    const router = useRouter()
-    const [formDatas, setFormDatas] = useState<EventForm[]>([])
+    const router = useRouter();
+    const [formDatas, setFormDatas] = useState<EventForm[]>([]);
 
     useEffect(() => {
-        fetchAllFormData()
-    }, [])
+        fetchAllFormData();
+    }, []);
 
     const fetchAllFormData = async () => {
-        const response = await axios.get(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/forms`
-        );
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/forms`);
         console.log('response.data', response.data);
         if (response.data.success) {
-            setFormDatas(response.data.forms)
+            setFormDatas(response.data.forms);
         } else {
-            alert(response.data.error?.toString() || 'error')
+            alert(response.data.error?.toString() || 'error');
         }
-    }
+    };
 
     const handleClickForm = (formData: any) => {
-        router.push(`/forms/${formData?.id}`)
-    }
+        router.push(`/forms/${formData?.id}`);
+    };
 
     return (
         <>
-            {/* 默认显示form id */}
-            {/* <FormDetail /> */}
-
-            {/* 显示form list */}
             <div className="container mx-auto p-4">
                 {formDatas?.map((data, index: number) => (
-                    <div key={index} className='flex flex-col mb-4'>
+                    <div key={index} className="flex flex-col mb-4">
                         <div
-                            onClick={() => { handleClickForm(data) }}
-                            className='cursor-pointer p-2 border border-gray-200 rounded hover:bg-gray-100'
+                            onClick={() => {
+                                handleClickForm(data);
+                            }}
+                            className="cursor-pointer p-2 border border-gray-200 rounded hover:bg-gray-100"
                         >
-                            <label className='font-semibold'>{data?.json_schema?.title}</label>
+                            <label className="font-semibold">{data?.json_schema?.title}</label>
                         </div>
                     </div>
                 ))}
