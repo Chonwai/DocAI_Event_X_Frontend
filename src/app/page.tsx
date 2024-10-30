@@ -38,7 +38,7 @@ export default function Home() {
                         姓名 <span className="text-red-500">*</span>
                     </label>
                     <div className="flex items-center border rounded">
-                        <User className="w-5 h-5 text-gray-400 ml-2" />
+                        <User className="w-5 h-5 text-gray-400 mx-2" />
                         <input
                             {...register('name', { required: true })}
                             className="flex-1 p-2 focus:outline-none"
@@ -53,7 +53,7 @@ export default function Home() {
                         電子郵件 <span className="text-red-500">*</span>
                     </label>
                     <div className="flex items-center border rounded">
-                        <Mail className="w-5 h-5 text-gray-400 ml-2" />
+                        <Mail className="w-5 h-5 text-gray-400 mx-2" />
                         <input
                             type="email"
                             {...register('email', { required: true })}
@@ -67,7 +67,7 @@ export default function Home() {
                 <div>
                     <label className="block text-sm font-medium mb-1">電話號碼</label>
                     <div className="flex items-center border rounded">
-                        <Phone className="w-5 h-5 text-gray-400 ml-2" />
+                        <Phone className="w-5 h-5 text-gray-400 mx-2" />
                         <input
                             {...register('phone_number')}
                             className="flex-1 p-2 focus:outline-none"
@@ -79,7 +79,7 @@ export default function Home() {
                 <div>
                     <label className="block text-sm font-medium mb-1">國家</label>
                     <div className="flex items-center border rounded">
-                        <Globe className="w-5 h-5 text-gray-400 ml-2" />
+                        <Globe className="w-5 h-5 text-gray-400 mx-2" />
                         <select
                             {...register('country')}
                             className="flex-1 p-2 focus:outline-none"
@@ -96,7 +96,7 @@ export default function Home() {
                     type="submit"
                     className="flex items-center justify-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
                 >
-                    提交 <CheckCircle className="w-5 h-5 ml-2" />
+                    提交 <CheckCircle className="w-5 h-5 mx-2" />
                 </button>
             </form>
 
