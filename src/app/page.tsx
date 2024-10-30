@@ -17,8 +17,7 @@ export default function Home() {
 
     const onSubmit = async (data: any) => {
         try {
-            // 假設您已經有一個表單 ID
-            const formId = 'YOUR_FORM_ID'; // 替換為實際表單 ID
+            const formId = process.env.NEXT_PUBLIC_FORM_ID; // 替換為實際表單 ID
             const response = await axios.post(
                 `${process.env.NEXT_PUBLIC_API_BASE_URL}/forms/${formId}/submissions`,
                 { form_submission: { submission_data: data } }
