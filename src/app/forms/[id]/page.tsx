@@ -43,7 +43,9 @@ export default function FormDetail() {
         console.log('form id', params['id']);
         setLoading(true);
         const formId = params['id'] || process.env.NEXT_PUBLIC_FORM_ID; //'98d9afbe-4b7f-492d-ad0b-9d2a4e95b262'
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/forms/${formId}`);
+        const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/forms/${formId}`
+        );
         setLoading(false);
         console.log('response.data', response.data);
         if (response.data.success) {
