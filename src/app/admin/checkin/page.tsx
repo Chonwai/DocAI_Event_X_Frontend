@@ -15,7 +15,7 @@ const CheckIn: React.FC = () => {
     } | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    const handleScan = async (detectedCodes: DetectedBarcode[]) => {
+    const handleScan = async (detectedCodes: any) => {
         if (detectedCodes && detectedCodes.length > 0) {
             const data = detectedCodes[0].rawValue;
             setScanResult(data);
