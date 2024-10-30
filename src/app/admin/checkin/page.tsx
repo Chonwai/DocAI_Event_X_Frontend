@@ -16,12 +16,19 @@ const CheckIn: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
 
     const handleScan = async (detectedCodes: any) => {
+        console.log(detectedCodes);
         if (detectedCodes && detectedCodes.length > 0) {
             const data = detectedCodes[0].rawValue;
             setScanResult(data);
             try {
                 const response = await axios.patch(
-                    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/form_submissions/${data}/check_in`
+                    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/form_submissions/${data}/check_in`,
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${process.env.NEXT_PUBLIC_BEARER_TOKEN}`
+                        }
+                    }
                 );
                 setCheckInStatus({ success: true, message: response.data.message });
             } catch (err: any) {
