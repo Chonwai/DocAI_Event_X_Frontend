@@ -28,15 +28,15 @@ const AdminDashboard: React.FC = () => {
     const [submissions, setSubmissions] = useState<Submission[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const searchParams = useSearchParams()
-    const [page, setPage] = useState('1')
+    const searchParams = useSearchParams();
+    const [page, setPage] = useState('1');
     const [meta, setMeta] = useState({
-        "current_page": 1,
-        "next_page": null,
-        "prev_page": null,
-        "total_pages": 1,
-        "total_count": 0
-    })
+        current_page: 1,
+        next_page: null,
+        prev_page: null,
+        total_pages: 1,
+        total_count: 0
+    });
     const params = useParams();
     useEffect(() => {
         const fetchSubmissions = async () => {
@@ -47,7 +47,7 @@ const AdminDashboard: React.FC = () => {
                 );
                 if (response.data.success) {
                     setSubmissions(response.data.form_submissions);
-                    setMeta(response.data.meta)
+                    setMeta(response.data.meta);
                 }
             } catch (err: any) {
                 setError('無法獲取報名者信息。');
@@ -62,7 +62,8 @@ const AdminDashboard: React.FC = () => {
     useEffect(() => {
         const handleScroll = () => {
             if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
-                if (meta.next_page) { // 檢查是否有下一頁
+                if (meta.next_page) {
+                    // 檢查是否有下一頁
                     setPage((prevPage) => prevPage + 1); // 增加頁碼以加載更多數據
                 }
             }
@@ -76,10 +77,9 @@ const AdminDashboard: React.FC = () => {
 
     useEffect(() => {
         if (searchParams && searchParams.get('page')) {
-            setPage(searchParams.get('page') as string)
+            setPage(searchParams.get('page') as string);
         }
-    }, [searchParams])
-
+    }, [searchParams]);
 
     const handleCheckin = async (qrcode_id: string) => {
         try {
@@ -94,7 +94,7 @@ const AdminDashboard: React.FC = () => {
             );
             // console.log('response', response);
             if (response.data.success) {
-                alert(response.data.message)
+                alert(response.data.message);
                 //成功簽到，更改狀態checked_in=true
                 setSubmissions((prevSubmissions) =>
                     prevSubmissions.map((submission) =>
@@ -104,16 +104,13 @@ const AdminDashboard: React.FC = () => {
                     )
                 );
             } else {
-                alert('無法手動簽到')
+                alert('無法手動簽到');
             }
-
-        } catch (err: any) {
-
-        }
-    }
+        } catch (err: any) {}
+    };
 
     const handleCheckout = async (form_submission_id: string) => {
-        alert('未接api')
+        alert('未接api');
         // try {
         //     const response = await axios.patch(
         //         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/form_submissions/${qrcode_id}/check_in`,
@@ -142,7 +139,7 @@ const AdminDashboard: React.FC = () => {
         // } catch (err: any) {
 
         // }
-    }
+    };
 
     const handleDeleteFormSubmission = async (form_submission_id: string) => {
         try {
@@ -156,18 +153,15 @@ const AdminDashboard: React.FC = () => {
             );
             // console.log('response', response);
             if (response.data.success) {
-                alert(response.data.message)
+                alert(response.data.message);
                 setSubmissions((prevSubmissions) =>
-                    prevSubmissions.filter(submission => submission.id !== form_submission_id)
+                    prevSubmissions.filter((submission) => submission.id !== form_submission_id)
                 );
             } else {
-                alert('無法刪除')
+                alert('無法刪除');
             }
-
-        } catch (err: any) {
-
-        }
-    }
+        } catch (err: any) {}
+    };
 
     const handleResendEmail = async (form_submission_id: string) => {
         try {
@@ -182,15 +176,12 @@ const AdminDashboard: React.FC = () => {
             );
             // console.log('response', response);
             if (response.data.success) {
-                alert(response.data.message)
+                alert(response.data.message);
             } else {
-                alert(response.data.message || '重發失敗')
+                alert(response.data.message || '重發失敗');
             }
-
-        } catch (err: any) {
-
-        }
-    }
+        } catch (err: any) {}
+    };
 
     // if (loading) {
     //     return <div className="text-center mt-10">Loading...</div>;
@@ -214,13 +205,19 @@ const AdminDashboard: React.FC = () => {
                     <table className="min-w-full my-4 bg-white border table-auto">
                         <thead>
                             <tr className="bg-gray-200">
-                                <th className="  border-b text-center w-[40px] whitespace-nowrap">編號</th>
+                                <th className="  border-b text-center w-[40px] whitespace-nowrap">
+                                    編號
+                                </th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left">姓名</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left">身份</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left">電子郵件</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left">電話號碼</th>
-                                <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">國家/地區</th>
-                                <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">入場狀態</th>
+                                <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">
+                                    國家/地區
+                                </th>
+                                <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">
+                                    入場狀態
+                                </th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left">報名時間</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left">操作</th>
                             </tr>
@@ -228,11 +225,10 @@ const AdminDashboard: React.FC = () => {
                         <tbody>
                             {submissions?.map((submission, index) => (
                                 <tr key={submission.qrcode_id} className="hover:bg-gray-100">
-                                    <td className=" border-b text-center  w-[40px]">
-                                        {index + 1}
-                                    </td>
+                                    <td className=" border-b text-center  w-[40px]">{index + 1}</td>
                                     <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap">
-                                        {submission.submission_data.lastName} {submission.submission_data.firstName}
+                                        {submission.submission_data.lastName}{' '}
+                                        {submission.submission_data.firstName}
                                     </td>
                                     <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap">
                                         {submission.submission_data.role}
@@ -248,7 +244,7 @@ const AdminDashboard: React.FC = () => {
                                     </td>
                                     <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap">
                                         {submission.checked_in ? (
-                                            <div className='flex flex-row items-center text-sm'>
+                                            <div className="flex flex-row items-center text-sm">
                                                 <span className="text-green-500 flex items-center">
                                                     已入場
                                                 </span>
@@ -264,37 +260,49 @@ const AdminDashboard: React.FC = () => {
                                         {moment(submission.created_at).format('MM-DD HH:mm')}
                                     </td>
                                     <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap ">
-                                        <div className='flex flex-row items-center'>
+                                        <div className="flex flex-row items-center">
                                             {!submission.checked_in ? (
-                                                <span className="text-blue-500 text-sm flex items-center cursor-pointer" onClick={() => {
-                                                    if (window.confirm('確定要簽到嗎？')) {
-                                                        handleCheckin(submission.qrcode_id);
-                                                    }
-                                                }}>
+                                                <span
+                                                    className="text-blue-500 text-sm flex items-center cursor-pointer"
+                                                    onClick={() => {
+                                                        if (window.confirm('確定要簽到嗎？')) {
+                                                            handleCheckin(submission.qrcode_id);
+                                                        }
+                                                    }}
+                                                >
                                                     簽到
                                                 </span>
                                             ) : (
-                                                <span className="ml-2 text-blue-500 text-sm flex items-center cursor-pointer" onClick={() => {
-                                                    if (window.confirm('確定要取消簽到嗎？')) {
-                                                        handleCheckout(submission.id);
-                                                    }
-                                                }}>
+                                                <span
+                                                    className="ml-2 text-blue-500 text-sm flex items-center cursor-pointer"
+                                                    onClick={() => {
+                                                        if (window.confirm('確定要取消簽到嗎？')) {
+                                                            handleCheckout(submission.id);
+                                                        }
+                                                    }}
+                                                >
                                                     取消簽到
                                                 </span>
                                             )}
 
-                                            <span className="ml-2 text-blue-500 text-sm flex items-center cursor-pointer" onClick={() => {
-                                                if (window.confirm('確定要重發Email嗎？')) {
-                                                    handleResendEmail(submission.id);
-                                                }
-                                            }}>
+                                            <span
+                                                className="ml-2 text-blue-500 text-sm flex items-center cursor-pointer"
+                                                onClick={() => {
+                                                    if (window.confirm('確定要重發Email嗎？')) {
+                                                        handleResendEmail(submission.id);
+                                                    }
+                                                }}
+                                            >
                                                 重發Email
                                             </span>
-                                            <span className="ml-2 text-red-500 text-sm flex items-center cursor-pointer" onClick={() => {
-                                                if (window.confirm('確定要刪除嗎？')) {
-                                                    handleDeleteFormSubmission(submission.id);
-                                                }
-                                            }}>
+                                            <span
+                                                className="ml-2 text-red-500 text-sm flex items-center cursor-pointer"
+                                                onClick={() => {
+                                                    if (window.confirm('確定要刪除嗎？')) {
+                                                        handleDeleteFormSubmission(submission.id);
+                                                    }
+                                                }}
+                                            >
                                                 <Trash2Icon className="w-4 h-4 ml-1 text-red-500" />
                                             </span>
                                         </div>
@@ -306,7 +314,7 @@ const AdminDashboard: React.FC = () => {
                 </div>
             </div>
             {loading && <div className="text-center mt-10">Loading...</div>}
-            <div className='hidden'>
+            <div className="hidden">
                 <h2 className="text-xl font-semibold flex items-center">
                     <BarChart2 className="w-6 h-6 mr-2" /> 統計數據
                 </h2>

@@ -53,7 +53,6 @@ const AdminDashboard: React.FC = () => {
 
     return (
         <div className="container mx-auto p-4">
-
             <div className="mb-4">
                 <h2 className="text-xl font-semibold flex items-center">
                     <User className="w-6 h-6 mr-2" /> 詳細
@@ -68,7 +67,6 @@ const AdminDashboard: React.FC = () => {
                             <th className="py-3 px-6 border-b text-left">入場狀態</th>
                         </tr>
                     </thead>
-
                 </table>
             </div>
         </div>
