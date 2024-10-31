@@ -158,7 +158,7 @@ const AdminDashboard: React.FC = () => {
                                         {submission.submission_data.country}
                                     </td>
                                     <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap">
-                                        {!submission.checked_in ? (
+                                        {submission.checked_in ? (
                                             <div className='flex flex-row items-center text-sm'>
                                                 <span className="text-green-500 flex items-center">
                                                     已入場
@@ -172,7 +172,7 @@ const AdminDashboard: React.FC = () => {
                                         )}
                                     </td>
                                     <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap">
-                                        {submission.checked_in && (
+                                        {!submission.checked_in && (
                                             <span className="text-red-500 text-sm flex items-center cursor-pointer" onClick={() => {
                                                 if (window.confirm('確定要簽到嗎？')) {
                                                     handleCheckin(submission.qrcode_id);
