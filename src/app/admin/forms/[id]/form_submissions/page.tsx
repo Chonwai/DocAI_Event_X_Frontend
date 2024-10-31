@@ -214,13 +214,13 @@ const AdminDashboard: React.FC = () => {
                     <table className="min-w-full my-4 bg-white border table-auto">
                         <thead>
                             <tr className="bg-gray-200">
-                                <th className="  border-b text-center w-[40px]">編號</th>
+                                <th className="  border-b text-center w-[40px] whitespace-nowrap">編號</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left">姓名</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left">身份</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left">電子郵件</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left">電話號碼</th>
-                                <th className="py-3 px-2 sm:px-6 border-b text-left">國家/地區</th>
-                                <th className="py-3 px-2 sm:px-6 border-b text-left">入場狀態</th>
+                                <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">國家/地區</th>
+                                <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">入場狀態</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left">報名時間</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left">操作</th>
                             </tr>
@@ -243,7 +243,7 @@ const AdminDashboard: React.FC = () => {
                                     <td className="py-3 px-2 sm:px-6 border-b">
                                         {submission.submission_data.mobileNumber}
                                     </td>
-                                    <td className="py-3 px-2 sm:px-6 border-b">
+                                    <td className="py-3 px-2 sm:px-6 border-b ">
                                         {submission.submission_data.country}
                                     </td>
                                     <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap">
