@@ -19,7 +19,7 @@ export interface EventForm {
 export default function Home() {
     const router = useRouter();
     const [formDatas, setFormDatas] = useState<EventForm[]>([]);
-    const title = `HKU Information Day 2024 in Macau 香港大學本科入學資訊日2024（澳門）`
+    const title = `HKU Information Day 2024 in Macau 香港大學本科入學資訊日 2024（澳門）`
     const description = `
     Date 日期：9 November 2024 (Saturday)​ 2024年11月9日（星期六）<br/>
     Time 時間： 9:00am-6:00pm<br/>
@@ -35,7 +35,7 @@ export default function Home() {
 
     const fetchAllFormData = async () => {
         const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/forms`);
-        console.log('response.data', response.data);
+        // console.log('response.data', response.data);
         if (response.data.success) {
             setFormDatas(response.data.forms);
         } else {

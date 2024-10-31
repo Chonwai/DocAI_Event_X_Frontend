@@ -3,11 +3,12 @@
 'use client';
 
 import axios from 'axios';
-import { BarChart2, CheckCircle, List, User } from 'lucide-react';
+import { BarChart2, CheckCircle, List, Trash2Icon, User } from 'lucide-react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 interface Submission {
+    id: string;
     qrcode_id: string;
     submission_data: {
         firstName: string;
@@ -88,7 +89,7 @@ const AdminDashboard: React.FC = () => {
                     }
                 }
             );
-            console.log('response', response);
+            // console.log('response', response);
             if (response.data.success) {
                 alert(response.data.message)
                 //成功簽到，更改狀態checked_in=true
@@ -101,6 +102,31 @@ const AdminDashboard: React.FC = () => {
                 );
             } else {
                 alert('無法手動簽到')
+            }
+
+        } catch (err: any) {
+
+        }
+    }
+
+    const handleDeleteFormSubmission = async (form_submission_id: string) => {
+        try {
+            const response = await axios.delete(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/form_submissions/${form_submission_id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${process.env.NEXT_PUBLIC_BEARER_TOKEN}`
+                    }
+                }
+            );
+            // console.log('response', response);
+            if (response.data.success) {
+                alert(response.data.message)
+                setSubmissions((prevSubmissions) =>
+                    prevSubmissions.filter(submission => submission.id !== form_submission_id)
+                );
+            } else {
+                alert('無法刪除')
             }
 
         } catch (err: any) {
@@ -171,16 +197,25 @@ const AdminDashboard: React.FC = () => {
                                             <span className="text-red-500">未入場</span>
                                         )}
                                     </td>
-                                    <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap">
-                                        {!submission.checked_in && (
-                                            <span className="text-red-500 text-sm flex items-center cursor-pointer" onClick={() => {
-                                                if (window.confirm('確定要簽到嗎？')) {
-                                                    handleCheckin(submission.qrcode_id);
+                                    <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap ">
+                                        <div className='flex flex-row items-center'>
+                                            {!submission.checked_in && (
+                                                <span className="text-red-500 text-sm flex items-center cursor-pointer" onClick={() => {
+                                                    if (window.confirm('確定要簽到嗎？')) {
+                                                        handleCheckin(submission.qrcode_id);
+                                                    }
+                                                }}>
+                                                    簽到
+                                                </span>
+                                            )}
+                                            <span className="ml-2 text-red-500 text-sm flex items-center cursor-pointer" onClick={() => {
+                                                if (window.confirm('確定要刪除嗎？')) {
+                                                    handleDeleteFormSubmission(submission.id);
                                                 }
                                             }}>
-                                                簽到
+                                                <Trash2Icon className="w-4 h-4 ml-1 text-red-500" />
                                             </span>
-                                        )}
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

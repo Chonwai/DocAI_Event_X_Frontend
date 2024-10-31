@@ -31,7 +31,7 @@ const AdminDashboard: React.FC = () => {
     const fetchAllFormData = async () => {
         setLoading(true);
         const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/forms`);
-        console.log('response.data', response.data);
+        // console.log('response.data', response.data);
         setLoading(false);
         if (response.data.success) {
             setFormDatas(response.data.forms);
