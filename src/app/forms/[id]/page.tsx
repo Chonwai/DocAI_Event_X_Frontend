@@ -188,7 +188,7 @@ export default function FormDetail() {
                                 )}
                                 {errors[key] && (
                                     <span className="text-red-500 text-sm mt-1">
-                                        {errors[key]?.message}
+                                        {String(errors[key]?.message)}
                                     </span>
                                 )}
                             </div>
@@ -196,6 +196,7 @@ export default function FormDetail() {
                     })}
                     <div className="flex justify-end">
                         <button
+                        
                             type="submit"
                             disabled={submitting}
                             className={`bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition ${
