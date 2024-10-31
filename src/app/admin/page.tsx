@@ -41,7 +41,7 @@ const AdminDashboard: React.FC = () => {
     };
 
     const handleClickForm = (formData: any) => {
-        router.push(`/admin/form_submissions/${formData?.id}`);
+        router.push(`/admin/forms/${formData?.id}/form_submissions`);
     };
 
     if (loading) {

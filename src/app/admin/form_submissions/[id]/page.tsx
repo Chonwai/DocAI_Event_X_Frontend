@@ -3,23 +3,25 @@
 'use client';
 
 import axios from 'axios';
-import { BarChart2, CheckCircle, List, User } from 'lucide-react';
+import { User } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 interface Submission {
     qrcode_id: string;
     submission_data: {
+        firstName: string;
+        lastName: string;
         name: string;
         email: string;
-        phone_number: string;
+        mobileNumber: string;
         country: string;
     };
     checked_in: boolean;
 }
 
 const AdminDashboard: React.FC = () => {
-    const [submissions, setSubmissions] = useState<Submission[]>([]);
+    const [formSubmission, setFormSubmission] = useState<Submission[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const params = useParams();
@@ -30,7 +32,7 @@ const AdminDashboard: React.FC = () => {
                 const response = await axios.get(
                     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/form_submissions/${formId}`
                 );
-                setSubmissions(response.data);
+                setFormSubmission(response.data.form_submission);
             } catch (err: any) {
                 setError('無法獲取報名者信息。');
             } finally {
@@ -51,59 +53,23 @@ const AdminDashboard: React.FC = () => {
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4 flex items-center">
-                <List className="w-6 h-6 mr-2" /> 管理員後台
-            </h1>
 
             <div className="mb-4">
                 <h2 className="text-xl font-semibold flex items-center">
-                    <User className="w-6 h-6 mr-2" /> 報名者列表
+                    <User className="w-6 h-6 mr-2" /> 詳細
                 </h2>
-                <table className="min-w-full bg-white border">
+                <table className="min-w-full my-4 bg-white border">
                     <thead>
-                        <tr>
-                            <th className="py-2 px-4 border-b">姓名</th>
-                            <th className="py-2 px-4 border-b">電子郵件</th>
-                            <th className="py-2 px-4 border-b">電話號碼</th>
-                            <th className="py-2 px-4 border-b">國家</th>
-                            <th className="py-2 px-4 border-b">入場狀態</th>
+                        <tr className="bg-gray-200">
+                            <th className="py-3 px-6 border-b text-left">姓名</th>
+                            <th className="py-3 px-6 border-b text-left">電子郵件</th>
+                            <th className="py-3 px-6 border-b text-left">電話號碼</th>
+                            <th className="py-3 px-6 border-b text-left">國家</th>
+                            <th className="py-3 px-6 border-b text-left">入場狀態</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {submissions.map((submission) => (
-                            <tr key={submission.qrcode_id}>
-                                <td className="py-2 px-4 border-b">
-                                    {submission.submission_data.name}
-                                </td>
-                                <td className="py-2 px-4 border-b">
-                                    {submission.submission_data.email}
-                                </td>
-                                <td className="py-2 px-4 border-b">
-                                    {submission.submission_data.phone_number}
-                                </td>
-                                <td className="py-2 px-4 border-b">
-                                    {submission.submission_data.country}
-                                </td>
-                                <td className="py-2 px-4 border-b">
-                                    {submission.checked_in ? (
-                                        <span className="text-green-500 flex items-center">
-                                            已入場 <CheckCircle className="w-4 h-4 ml-1" />
-                                        </span>
-                                    ) : (
-                                        <span className="text-red-500">未入場</span>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
 
-            <div>
-                <h2 className="text-xl font-semibold flex items-center">
-                    <BarChart2 className="w-6 h-6 mr-2" /> 統計數據
-                </h2>
-                {/* 集成圖表庫來展示統計數據 */}
+                </table>
             </div>
         </div>
     );
