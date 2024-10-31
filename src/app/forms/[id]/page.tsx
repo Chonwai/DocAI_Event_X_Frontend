@@ -83,7 +83,7 @@ export default function FormDetail() {
 
     return (
         <div className="container mx-auto p-4 max-w-3xl">
-            <img src='../bg.png'></img>
+            <img src='../bg.jpeg'></img>
             {/* <h1 className="text-2xl font-bold mb-4">{formData?.json_schema?.title}</h1> */}
             {!qrCode && (
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">

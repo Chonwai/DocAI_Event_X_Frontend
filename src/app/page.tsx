@@ -41,7 +41,7 @@ export default function Home() {
     return (
         <>
             <div className="container mx-auto p-4 max-w-3xl">
-                <img src='./bg.png'></img>
+                <img src='./bg.jpeg'></img>
                 {formDatas?.map((data, index: number) => (
                     <div key={index} className="flex flex-col mb-4 my-4">
                         <div
