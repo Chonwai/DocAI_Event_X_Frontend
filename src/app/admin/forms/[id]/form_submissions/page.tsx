@@ -4,6 +4,7 @@
 
 import axios from 'axios';
 import { BarChart2, CheckCircle, List, Trash2Icon, User } from 'lucide-react';
+import moment from 'moment';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -15,10 +16,12 @@ interface Submission {
         lastName: string;
         name: string;
         email: string;
+        role: string;
         mobileNumber: string;
         country: string;
     };
     checked_in: boolean;
+    created_at: string;
 }
 
 const AdminDashboard: React.FC = () => {
@@ -109,6 +112,38 @@ const AdminDashboard: React.FC = () => {
         }
     }
 
+    const handleCheckout = async (form_submission_id: string) => {
+        alert('未接api')
+        // try {
+        //     const response = await axios.patch(
+        //         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/form_submissions/${qrcode_id}/check_in`,
+        //         {},
+        //         {
+        //             headers: {
+        //                 Authorization: `Bearer ${process.env.NEXT_PUBLIC_BEARER_TOKEN}`
+        //             }
+        //         }
+        //     );
+        //     // console.log('response', response);
+        //     if (response.data.success) {
+        //         alert(response.data.message)
+        //         //成功簽到，更改狀態checked_in=true
+        //         setSubmissions((prevSubmissions) =>
+        //             prevSubmissions.map((submission) =>
+        //                 submission.qrcode_id === qrcode_id
+        //                     ? { ...submission, checked_in: true }
+        //                     : submission
+        //             )
+        //         );
+        //     } else {
+        //         alert('無法手動簽到')
+        //     }
+
+        // } catch (err: any) {
+
+        // }
+    }
+
     const handleDeleteFormSubmission = async (form_submission_id: string) => {
         try {
             const response = await axios.delete(
@@ -127,6 +162,29 @@ const AdminDashboard: React.FC = () => {
                 );
             } else {
                 alert('無法刪除')
+            }
+
+        } catch (err: any) {
+
+        }
+    }
+
+    const handleResendEmail = async (form_submission_id: string) => {
+        try {
+            const response = await axios.post(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/form_submissions/${form_submission_id}/resend_confirmation_email`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${process.env.NEXT_PUBLIC_BEARER_TOKEN}`
+                    }
+                }
+            );
+            // console.log('response', response);
+            if (response.data.success) {
+                alert(response.data.message)
+            } else {
+                alert(response.data.message || '重發失敗')
             }
 
         } catch (err: any) {
@@ -158,10 +216,12 @@ const AdminDashboard: React.FC = () => {
                             <tr className="bg-gray-200">
                                 <th className="  border-b text-center w-[40px]">編號</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left">姓名</th>
+                                <th className="py-3 px-2 sm:px-6 border-b text-left">身份</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left">電子郵件</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left">電話號碼</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left">國家</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left">入場狀態</th>
+                                <th className="py-3 px-2 sm:px-6 border-b text-left">報名時間</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left">操作</th>
                             </tr>
                         </thead>
@@ -173,6 +233,9 @@ const AdminDashboard: React.FC = () => {
                                     </td>
                                     <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap">
                                         {submission.submission_data.lastName} {submission.submission_data.firstName}
+                                    </td>
+                                    <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap">
+                                        {submission.submission_data.role}
                                     </td>
                                     <td className="py-3 px-2 sm:px-6 border-b">
                                         {submission.submission_data.email}
@@ -197,17 +260,36 @@ const AdminDashboard: React.FC = () => {
                                             <span className="text-red-500">未入場</span>
                                         )}
                                     </td>
+                                    <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap">
+                                        {moment(submission.created_at).format('MM-DD HH:mm')}
+                                    </td>
                                     <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap ">
                                         <div className='flex flex-row items-center'>
-                                            {!submission.checked_in && (
-                                                <span className="text-red-500 text-sm flex items-center cursor-pointer" onClick={() => {
+                                            {!submission.checked_in ? (
+                                                <span className="text-blue-500 text-sm flex items-center cursor-pointer" onClick={() => {
                                                     if (window.confirm('確定要簽到嗎？')) {
                                                         handleCheckin(submission.qrcode_id);
                                                     }
                                                 }}>
                                                     簽到
                                                 </span>
+                                            ) : (
+                                                <span className="ml-2 text-blue-500 text-sm flex items-center cursor-pointer" onClick={() => {
+                                                    if (window.confirm('確定要取消簽到嗎？')) {
+                                                        handleCheckout(submission.id);
+                                                    }
+                                                }}>
+                                                    取消簽到
+                                                </span>
                                             )}
+
+                                            <span className="ml-2 text-blue-500 text-sm flex items-center cursor-pointer" onClick={() => {
+                                                if (window.confirm('確定要重發Email嗎？')) {
+                                                    handleResendEmail(submission.id);
+                                                }
+                                            }}>
+                                                重發Email
+                                            </span>
                                             <span className="ml-2 text-red-500 text-sm flex items-center cursor-pointer" onClick={() => {
                                                 if (window.confirm('確定要刪除嗎？')) {
                                                     handleDeleteFormSubmission(submission.id);

@@ -13,6 +13,7 @@
         "@yudiel/react-qr-scanner": "^2.0.8",
         "axios": "^1.7.7",
         "lucide-react": "^0.454.0",
+        "moment": "^2.30.1",
         "next": "15.0.1",
         "next-auth": "^4.24.10",
         "qrcode.react": "^4.1.0",
