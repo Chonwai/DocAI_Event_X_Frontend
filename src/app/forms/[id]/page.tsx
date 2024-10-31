@@ -82,10 +82,11 @@ export default function FormDetail() {
     }
 
     return (
-        <div className="container mx-auto p-4 max-w-4xl">
-            <h1 className="text-2xl font-bold mb-4">{formData?.json_schema?.title}</h1>
+        <div className="container mx-auto p-4 max-w-3xl">
+            <img src='../bg.png'></img>
+            {/* <h1 className="text-2xl font-bold mb-4">{formData?.json_schema?.title}</h1> */}
             {!qrCode && (
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
                     {Object.keys(formData.form_data).map((key) => {
                         const fieldSchema = formData.json_schema.properties[key];
                         const uiSchema = formData.ui_schema[key]; // 获取对应的 ui_schema
@@ -94,24 +95,31 @@ export default function FormDetail() {
                             <div key={key} className="flex flex-col">
                                 <label className="font-medium mb-1">{fieldSchema.title}</label>
                                 {fieldSchema.type === 'string' &&
-                                uiSchema?.['ui:widget'] === 'select' ? (
+                                    uiSchema?.['ui:widget'] === 'select' ? (
                                     // 处理下拉选择框
                                     <Controller
                                         name={key}
                                         control={control}
                                         defaultValue={formData.form_data[key]}
                                         render={({ field }) => (
-                                            <select {...field} className="border rounded p-2">
+                                            <div className="flex flex-col">
                                                 {fieldSchema.enum.map((item: string) => (
-                                                    <option key={item} value={item}>
+                                                    <label key={item} className="flex items-center">
+                                                        <input
+                                                            type="radio"
+                                                            value={item}
+                                                            checked={field.value === item}
+                                                            onChange={() => field.onChange(item)}
+                                                            className="mr-2"
+                                                        />
                                                         {item}
-                                                    </option>
+                                                    </label>
                                                 ))}
-                                            </select>
+                                            </div>
                                         )}
                                     />
                                 ) : fieldSchema.type === 'array' &&
-                                  uiSchema?.['ui:widget'] === 'checkboxes' ? (
+                                    uiSchema?.['ui:widget'] === 'checkboxes' ? (
                                     // 处理复选框
                                     <Controller
                                         name={key}
@@ -129,8 +137,8 @@ export default function FormDetail() {
                                                                 const newValue = e.target.checked
                                                                     ? [...field.value, item]
                                                                     : field.value.filter(
-                                                                          (v: string) => v !== item
-                                                                      );
+                                                                        (v: string) => v !== item
+                                                                    );
                                                                 field.onChange(newValue);
                                                             }}
                                                             className="mr-2"

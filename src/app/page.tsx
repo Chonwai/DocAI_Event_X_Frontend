@@ -1,6 +1,7 @@
 'use client';
 
 import axios from 'axios';
+import { MoveRightIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 export interface EventForm {
@@ -39,16 +40,28 @@ export default function Home() {
 
     return (
         <>
-            <div className="container mx-auto p-4">
+            <div className="container mx-auto p-4 max-w-3xl">
+                <img src='./bg.png'></img>
                 {formDatas?.map((data, index: number) => (
-                    <div key={index} className="flex flex-col mb-4">
+                    <div key={index} className="flex flex-col mb-4 my-4">
                         <div
                             onClick={() => {
                                 handleClickForm(data);
                             }}
-                            className="cursor-pointer p-2 border border-gray-200 rounded hover:bg-gray-100"
+                            className="cursor-pointer p-2  "
                         >
-                            <label className="font-semibold">{data?.json_schema?.title}</label>
+                            <p className="font-semibold text-2xl">{data?.json_schema?.title}</p>
+
+                            <p className='mt-4 font-semibold text-xl'>{data?.name}</p>
+                            <div dangerouslySetInnerHTML={{ __html: data?.description }} />
+                            <div className='mt-2 flex justify-end'>
+                                <button className='flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition'
+                                    onClick={() => {
+                                        handleClickForm(data);
+                                    }}>
+                                    <MoveRightIcon size={20} />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 ))}
