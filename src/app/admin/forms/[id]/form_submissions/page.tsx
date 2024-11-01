@@ -217,46 +217,46 @@ const AdminDashboard: React.FC = () => {
                                 <th className="  border-b text-center w-[40px] whitespace-nowrap">
                                     編號
                                 </th>
-                                <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">姓名</th>
-                                <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">學校</th>
-                                <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">身份</th>
-                                <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">電子郵件</th>
-                                <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">電話號碼</th>
-                                <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">
+                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">姓名</th>
+                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">學校</th>
+                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">身份</th>
+                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">電子郵件</th>
+                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">電話號碼</th>
+                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">
                                     國家/地區
                                 </th>
-                                <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">
+                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">
                                     入場狀態
                                 </th>
-                                <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">入場時間</th>
-                                <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">報名時間</th>
-                                <th className="py-3 px-2 sm:px-6 border-b text-left">操作</th>
+                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">入場時間</th>
+                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">報名時間</th>
+                                <th className="py-3 px-2 sm:px-2 border-b text-left">操作</th>
                             </tr>
                         </thead>
                         <tbody>
                             {submissions?.map((submission, index) => (
                                 <tr key={submission.qrcode_id} className="hover:bg-gray-100">
                                     <td className=" border-b text-center  w-[40px]">{index + 1}</td>
-                                    <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap">
+                                    <td className="py-3 px-2 sm:px-2 border-b whitespace-nowrap">
                                         {submission.submission_data.lastName}{' '}
                                         {submission.submission_data.firstName}
                                     </td>
-                                    <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap">
+                                    <td className="py-3 px-2 sm:px-2 border-b whitespace-nowrap">
                                         {submission.submission_data.schoolName}
                                     </td>
-                                    <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap">
+                                    <td className="py-3 px-2 sm:px-2 border-b whitespace-nowrap">
                                         {submission.submission_data.role}
                                     </td>
-                                    <td className="py-3 px-2 sm:px-6 border-b">
+                                    <td className="py-3 px-2 sm:px-2 border-b">
                                         {submission.submission_data.email}
                                     </td>
-                                    <td className="py-3 px-2 sm:px-6 border-b">
+                                    <td className="py-3 px-2 sm:px-2 border-b">
                                         {submission.submission_data.mobileNumber}
                                     </td>
-                                    <td className="py-3 px-2 sm:px-6 border-b ">
+                                    <td className="py-3 px-2 sm:px-2 border-b ">
                                         {submission.submission_data.country}
                                     </td>
-                                    <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap">
+                                    <td className="py-3 px-2 sm:px-2 border-b whitespace-nowrap">
                                         {submission.checked_in ? (
                                             <div className="flex flex-row items-center text-sm">
                                                 <span className="text-green-500 flex items-center">
@@ -270,13 +270,13 @@ const AdminDashboard: React.FC = () => {
                                             <span className="text-red-500">未入場</span>
                                         )}
                                     </td>
-                                    <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap">
+                                    <td className="py-3 px-2 sm:px-2 border-b whitespace-nowrap">
                                         {submission.check_in_at ? moment(submission.check_in_at).format('MM-DD HH:mm') : ''}
                                     </td>
-                                    <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap">
+                                    <td className="py-3 px-2 sm:px-2 border-b whitespace-nowrap">
                                         {moment(submission.created_at).format('MM-DD HH:mm')}
                                     </td>
-                                    <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap ">
+                                    <td className="py-3 px-2 sm:px-2 border-b whitespace-nowrap ">
                                         <div className="flex flex-row items-center">
                                             {!submission.checked_in ? (
                                                 <span
