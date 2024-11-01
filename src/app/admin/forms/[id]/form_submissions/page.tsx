@@ -2,14 +2,16 @@
 
 'use client';
 
+import ScanButton from '@/app/admin/components/ScanButton';
 import axios from 'axios';
 import { BarChart2, CheckCircle, List, Trash2Icon, User } from 'lucide-react';
 import moment from 'moment';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 interface Submission {
     id: string;
+    form_id: string;
     qrcode_id: string;
     submission_data: {
         firstName: string;
@@ -26,6 +28,7 @@ interface Submission {
 }
 
 const AdminDashboard: React.FC = () => {
+    const router = useRouter()
     const [submissions, setSubmissions] = useState<Submission[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -198,9 +201,14 @@ const AdminDashboard: React.FC = () => {
             </h1>
 
             <div className="mb-4">
-                <h2 className="text-xl font-semibold flex items-center">
-                    <User className="w-6 h-6 mr-2" /> 報名者列表({meta?.total_count || 0})
-                </h2>
+                <div className='flex flex-row items-center justify-between'>
+                    <h2 className="text-xl font-semibold flex items-center">
+                        <User className="w-6 h-6 mr-2" /> 報名者列表({meta?.total_count || 0})
+                    </h2>
+                    {/* <h2 className="text-xl font-semibold flex items-center text-green-500">
+                        <CheckCircle className="w-4 h-4 mr-1 text-green-500" /> CheckIn
+                    </h2> */}
+                </div>
                 <div className="overflow-x-auto">
                     <table className="min-w-full my-4 bg-white border table-auto">
                         <thead>
@@ -288,9 +296,9 @@ const AdminDashboard: React.FC = () => {
                                                     取消簽到
                                                 </span>
                                             )}
-
+                                            <span className="mx-2">|</span>
                                             <span
-                                                className="ml-2 text-blue-500 text-sm flex items-center cursor-pointer"
+                                                className="text-blue-500 text-sm flex items-center cursor-pointer"
                                                 onClick={() => {
                                                     if (window.confirm('確定要重發Email嗎？')) {
                                                         handleResendEmail(submission.id);
@@ -299,8 +307,17 @@ const AdminDashboard: React.FC = () => {
                                             >
                                                 重發Email
                                             </span>
+                                            <span className="mx-2">|</span>
                                             <span
-                                                className="ml-2 text-red-500 text-sm flex items-center cursor-pointer"
+                                                className="text-blue-500 text-sm flex items-center cursor-pointer hidden"
+                                                onClick={() => {
+                                                    router.push(`/admin/form_submissions/${submission.id}?form_id=${submission.form_id}`)
+                                                }}
+                                            >
+                                                詳細
+                                            </span>
+                                            <span
+                                                className=" text-red-500 text-sm flex items-center cursor-pointer"
                                                 onClick={() => {
                                                     if (window.confirm('確定要刪除嗎？')) {
                                                         handleDeleteFormSubmission(submission.id);
@@ -323,6 +340,9 @@ const AdminDashboard: React.FC = () => {
                     <BarChart2 className="w-6 h-6 mr-2" /> 統計數據
                 </h2>
                 {/* 集成圖表庫來展示統計數據 */}
+            </div>
+            <div className="mt-4 flex justify-end fixed bottom-6 right-2">
+                <ScanButton />
             </div>
         </div>
     );
