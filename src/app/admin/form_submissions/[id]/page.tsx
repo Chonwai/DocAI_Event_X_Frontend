@@ -105,6 +105,7 @@ const AdminDashboard: React.FC = () => {
                         const fieldSchema = formData.json_schema.properties[key];
                         const uiSchema = formData.ui_schema[key];
                         const isRequired = requiredFields.includes(key);
+                        if (!fieldSchema) return (<div key={key}></div>)
 
                         return (
                             <div key={key} className="flex flex-col">
