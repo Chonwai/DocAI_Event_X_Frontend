@@ -21,6 +21,7 @@ interface Submission {
         role: string;
         mobileNumber: string;
         country: string;
+        schoolName: string;
     };
     checked_in: boolean;
     created_at: string;
@@ -217,6 +218,7 @@ const AdminDashboard: React.FC = () => {
                                     編號
                                 </th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">姓名</th>
+                                <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">學校</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">身份</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">電子郵件</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">電話號碼</th>
@@ -238,6 +240,9 @@ const AdminDashboard: React.FC = () => {
                                     <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap">
                                         {submission.submission_data.lastName}{' '}
                                         {submission.submission_data.firstName}
+                                    </td>
+                                    <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap">
+                                        {submission.submission_data.schoolName}
                                     </td>
                                     <td className="py-3 px-2 sm:px-6 border-b whitespace-nowrap">
                                         {submission.submission_data.role}
