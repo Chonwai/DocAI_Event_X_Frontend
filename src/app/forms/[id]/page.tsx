@@ -96,6 +96,8 @@ export default function FormDetail() {
                         const fieldSchema = formData.json_schema.properties[key];
                         const uiSchema = formData.ui_schema[key];
                         const isRequired = requiredFields.includes(key);
+                        // console.log('key', fieldSchema);
+                        if (!fieldSchema) return (<div key={key}></div>)
 
                         return (
                             <div key={key} className="flex flex-col">
