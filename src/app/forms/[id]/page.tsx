@@ -19,6 +19,7 @@ export interface FormDetail {
     };
     form_data: any;
     ui_schema: any;
+    display_order: any[]
 }
 
 export default function FormDetail() {
@@ -91,7 +92,7 @@ export default function FormDetail() {
             <img src="../bg.jpeg" alt="背景圖片" />
             {!qrCode && (
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
-                    {Object.keys(formData.form_data).map((key) => {
+                    {formData.display_order.map((key) => {
                         const fieldSchema = formData.json_schema.properties[key];
                         const uiSchema = formData.ui_schema[key];
                         const isRequired = requiredFields.includes(key);
@@ -103,7 +104,7 @@ export default function FormDetail() {
                                     {isRequired && <span className="text-red-500"> *</span>}
                                 </label>
                                 {fieldSchema.type === 'string' &&
-                                uiSchema?.['ui:widget'] === 'select' ? (
+                                    uiSchema?.['ui:widget'] === 'select' ? (
                                     <Controller
                                         name={key}
                                         control={control}
@@ -131,7 +132,7 @@ export default function FormDetail() {
                                         )}
                                     />
                                 ) : fieldSchema.type === 'array' &&
-                                  uiSchema?.['ui:widget'] === 'checkboxes' ? (
+                                    uiSchema?.['ui:widget'] === 'checkboxes' ? (
                                     <Controller
                                         name={key}
                                         control={control}
@@ -155,8 +156,8 @@ export default function FormDetail() {
                                                                 const newValue = e.target.checked
                                                                     ? [...field.value, item]
                                                                     : field.value.filter(
-                                                                          (v: string) => v !== item
-                                                                      );
+                                                                        (v: string) => v !== item
+                                                                    );
                                                                 field.onChange(newValue);
                                                             }}
                                                             className="mr-2"
@@ -196,12 +197,11 @@ export default function FormDetail() {
                     })}
                     <div className="flex justify-end">
                         <button
-                        
+
                             type="submit"
                             disabled={submitting}
-                            className={`bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition ${
-                                submitting ? 'opacity-50 cursor-not-allowed' : ''
-                            }`}
+                            className={`bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition ${submitting ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
                         >
                             {submitting ? '提交中...' : '提交'}
                         </button>

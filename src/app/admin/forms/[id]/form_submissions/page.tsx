@@ -219,15 +219,15 @@ const AdminDashboard: React.FC = () => {
                                 <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">姓名</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">身份</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">電子郵件</th>
-                                <th className="py-3 px-2 sm:px-6 border-b text-left ">電話號碼</th>
+                                <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">電話號碼</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">
                                     國家/地區
                                 </th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">
                                     入場狀態
                                 </th>
-                                <th className="py-3 px-2 sm:px-6 border-b text-left">入場時間</th>
-                                <th className="py-3 px-2 sm:px-6 border-b text-left">報名時間</th>
+                                <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">入場時間</th>
+                                <th className="py-3 px-2 sm:px-6 border-b text-left whitespace-nowrap">報名時間</th>
                                 <th className="py-3 px-2 sm:px-6 border-b text-left">操作</th>
                             </tr>
                         </thead>

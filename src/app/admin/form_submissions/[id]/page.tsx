@@ -101,7 +101,7 @@ const AdminDashboard: React.FC = () => {
                 </div>
 
                 <form className="space-y-4 mt-4">
-                    {Object.keys(formData.form_data).map((key) => {
+                    {formData.display_order.map((key) => {
                         const fieldSchema = formData.json_schema.properties[key];
                         const uiSchema = formData.ui_schema[key];
                         const isRequired = requiredFields.includes(key);
