@@ -51,7 +51,11 @@ const AdminDashboard: React.FC = () => {
                     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/form_submissions/form/${formId}?page=${page}`
                 );
                 if (response.data.success) {
-                    setSubmissions(response.data.form_submissions);
+                    if (page == "1") {
+                        setSubmissions(response.data.form_submissions);
+                    } else {
+                        setSubmissions(submissions.concat(response.data.form_submissions))
+                    }
                     setMeta(response.data.meta);
                 }
             } catch (err: any) {
@@ -67,6 +71,7 @@ const AdminDashboard: React.FC = () => {
     useEffect(() => {
         const handleScroll = () => {
             if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+                // console.log('meta', meta);
                 if (meta.next_page) {
                     // 檢查是否有下一頁
                     setPage((prevPage) => prevPage + 1); // 增加頁碼以加載更多數據
