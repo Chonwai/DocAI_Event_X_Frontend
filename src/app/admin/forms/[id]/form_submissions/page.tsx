@@ -34,7 +34,7 @@ const AdminDashboard: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const searchParams = useSearchParams();
-    const [page, setPage] = useState('1');
+    const [page, setPage] = useState(1);
     const [meta, setMeta] = useState({
         current_page: 1,
         next_page: null,
@@ -51,7 +51,7 @@ const AdminDashboard: React.FC = () => {
                     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/form_submissions/form/${formId}?page=${page}`
                 );
                 if (response.data.success) {
-                    if (page == "1") {
+                    if (page == 1) {
                         setSubmissions(response.data.form_submissions);
                     } else {
                         setSubmissions(submissions.concat(response.data.form_submissions))
@@ -87,7 +87,7 @@ const AdminDashboard: React.FC = () => {
 
     useEffect(() => {
         if (searchParams && searchParams.get('page')) {
-            setPage(searchParams.get('page') as string);
+            setPage(Number(searchParams.get('page')));
         }
     }, [searchParams]);
 
