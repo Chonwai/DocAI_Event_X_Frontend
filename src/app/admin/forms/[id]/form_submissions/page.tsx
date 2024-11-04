@@ -46,11 +46,14 @@ const AdminDashboard: React.FC = () => {
     useEffect(() => {
         const fetchSubmissions = async () => {
             try {
+                setLoading(true);
                 const formId = params['id'] || process.env.NEXT_PUBLIC_FORM_ID; // 設置您的表單 ID
                 const response = await axios.get(
                     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/form_submissions/form/${formId}?page=${page}`
                 );
                 if (response.data.success) {
+                    console.log('page', page);
+
                     if (page == 1) {
                         setSubmissions(response.data.form_submissions);
                     } else {
@@ -58,9 +61,9 @@ const AdminDashboard: React.FC = () => {
                     }
                     setMeta(response.data.meta);
                 }
+                setLoading(false);
             } catch (err: any) {
                 setError('無法獲取報名者信息。');
-            } finally {
                 setLoading(false);
             }
         };
@@ -69,21 +72,39 @@ const AdminDashboard: React.FC = () => {
     }, [params, page]);
 
     useEffect(() => {
+        let isLoadingMore = false; // 新增标志位
+
         const handleScroll = () => {
             if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
                 // console.log('meta', meta);
-                if (meta.next_page) {
+                if (meta.next_page && !loading && !isLoadingMore) {
                     // 檢查是否有下一頁
+                    isLoadingMore = true; // 设置标志位为 true
                     setPage((prevPage) => prevPage + 1); // 增加頁碼以加載更多數據
                 }
             }
         };
 
-        window.addEventListener('scroll', handleScroll);
+        // window.addEventListener('scroll', handleScroll);
+        // return () => {
+        //     window.removeEventListener('scroll', handleScroll);
+        // };
+        const isMobile = /Mobi|Android/i.test(navigator.userAgent); // 检测是否为移动设备
+        // console.log('isMobile', isMobile);
+
+        if (isMobile) {
+            window.addEventListener('touchmove', handleScroll); // 仅在移动设备上使用 touchmove
+        } else {
+            window.addEventListener('scroll', handleScroll); // 仅在电脑端使用 scroll
+        }
         return () => {
-            window.removeEventListener('scroll', handleScroll);
+            if (isMobile) {
+                window.removeEventListener('touchmove', handleScroll);
+            } else {
+                window.removeEventListener('scroll', handleScroll);
+            }
         };
-    }, [meta]);
+    }, [meta, loading]);
 
     useEffect(() => {
         if (searchParams && searchParams.get('page')) {
