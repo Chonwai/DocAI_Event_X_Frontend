@@ -13,7 +13,7 @@ export default function ExportToXlsxButton({ name, disabled, datas }: ViewProps)
 
     useEffect(() => {
         if (datas) {
-            console.log('submissions datas', datas);
+            // console.log('submissions datas', datas);
 
         }
     }, [datas])
