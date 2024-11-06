@@ -2,6 +2,7 @@
 
 'use client';
 
+import ExportToXlsxButton from '@/app/admin/components/ExportToXlsxButton';
 import ScanButton from '@/app/admin/components/ScanButton';
 import axios from 'axios';
 import { BarChart2, CheckCircle, List, Trash2Icon, User } from 'lucide-react';
@@ -223,10 +224,17 @@ const AdminDashboard: React.FC = () => {
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4 flex items-center">
-                <List className="w-6 h-6 mr-2" /> 管理員後台
-            </h1>
+            <div className='flex flex-row items-center justify-between'>
 
+                <h1 className="text-2xl font-bold mb-4 flex items-center">
+                    <List className="w-6 h-6 mr-2" /> 管理員後台
+                </h1>
+                <ExportToXlsxButton
+                    name='submissions'
+                    datas={submissions}
+                    disabled={false}
+                />
+            </div>
             <div className="mb-4">
                 <div className='flex flex-row items-center justify-between'>
                     <h2 className="text-xl font-semibold flex items-center">

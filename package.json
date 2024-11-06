@@ -10,8 +10,10 @@
         "format": "prettier --single-quote --write \"./**/*.{js,jsx,ts,tsx,css,md,json}\" --config ./.prettierrc"
     },
     "dependencies": {
+        "@types/lodash": "^4.17.13",
         "@yudiel/react-qr-scanner": "^2.0.8",
         "axios": "^1.7.7",
+        "lodash": "^4.17.21",
         "lucide-react": "^0.454.0",
         "moment": "^2.30.1",
         "next": "15.0.1",
@@ -21,7 +23,8 @@
         "react-dom": "19.0.0-rc-69d4b800-20241021",
         "react-hook-form": "^7.53.1",
         "react-qr-scanner": "^1.0.0-alpha.11",
-        "swr": "^2.2.5"
+        "swr": "^2.2.5",
+        "xlsx": "^0.18.5"
     },
     "devDependencies": {
         "@types/node": "^20",
