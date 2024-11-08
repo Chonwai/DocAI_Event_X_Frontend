@@ -27,10 +27,10 @@ const AdminDashboard: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const params = useParams();
-    const router = useRouter()
-    const searchParams = useSearchParams()
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const [formData, setFormData] = useState<FormDetail>();
-    const [formId, setFormId] = useState('')
+    const [formId, setFormId] = useState('');
 
     useEffect(() => {
         if (searchParams && searchParams.get('form_id'))
@@ -61,7 +61,7 @@ const AdminDashboard: React.FC = () => {
                     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/form_submissions/${formId}`
                 );
                 setFormSubmission(response.data.form_submission);
-                setFormId(response.data.form_submission.form_id)
+                setFormId(response.data.form_submission.form_id);
             } catch (err: any) {
                 setError('無法獲取報名者信息。');
             } finally {
@@ -89,9 +89,12 @@ const AdminDashboard: React.FC = () => {
     return (
         <div className="container mx-auto p-4">
             <div className="mb-4">
-                <div className='flex flex-row items-center justify-between'>
-                    <h2 className="flex items-center"
-                        onClick={() => { router.back() }}
+                <div className="flex flex-row items-center justify-between">
+                    <h2
+                        className="flex items-center"
+                        onClick={() => {
+                            router.back();
+                        }}
                     >
                         <ChevronLeftIcon className="w-6 h-6 " /> 返回
                     </h2>
@@ -105,7 +108,7 @@ const AdminDashboard: React.FC = () => {
                         const fieldSchema = formData.json_schema.properties[key];
                         const uiSchema = formData.ui_schema[key];
                         const isRequired = requiredFields.includes(key);
-                        if (!fieldSchema) return (<div key={key}></div>)
+                        if (!fieldSchema) return <div key={key}></div>;
 
                         return (
                             <div key={key} className="flex flex-col">
@@ -114,7 +117,7 @@ const AdminDashboard: React.FC = () => {
                                     {isRequired && <span className="text-red-500"> *</span>}
                                 </label>
                                 {fieldSchema.type === 'string' &&
-                                    uiSchema?.['ui:widget'] === 'select' ? (
+                                uiSchema?.['ui:widget'] === 'select' ? (
                                     <Controller
                                         name={key}
                                         control={control}
@@ -142,7 +145,7 @@ const AdminDashboard: React.FC = () => {
                                         )}
                                     />
                                 ) : fieldSchema.type === 'array' &&
-                                    uiSchema?.['ui:widget'] === 'checkboxes' ? (
+                                  uiSchema?.['ui:widget'] === 'checkboxes' ? (
                                     <Controller
                                         name={key}
                                         control={control}
@@ -166,8 +169,8 @@ const AdminDashboard: React.FC = () => {
                                                                 const newValue = e.target.checked
                                                                     ? [...field.value, item]
                                                                     : field.value.filter(
-                                                                        (v: string) => v !== item
-                                                                    );
+                                                                          (v: string) => v !== item
+                                                                      );
                                                                 field.onChange(newValue);
                                                             }}
                                                             className="mr-2"

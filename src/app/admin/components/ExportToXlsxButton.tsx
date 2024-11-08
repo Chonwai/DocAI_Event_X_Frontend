@@ -10,19 +10,17 @@ interface ViewProps {
 }
 
 export default function ExportToXlsxButton({ name, disabled, datas }: ViewProps) {
-
     useEffect(() => {
         if (datas) {
             // console.log('submissions datas', datas);
-
         }
-    }, [datas])
+    }, [datas]);
     const handleExport = () => {
         // const filteredData = _.filter(datas, (item) => {
         //     return _.some(colums, (key) => key in item.submission_data);
         // });
         // const extractedData = _.map(filteredData, (item) => _.pick(item, colums));
-        const extractedData = _.map(datas, item => {
+        const extractedData = _.map(datas, (item) => {
             const submissionData = item.submission_data;
             // 检查 submission_data 是否为数组，如果是则转为字符串
             return {

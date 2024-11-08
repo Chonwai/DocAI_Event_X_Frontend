@@ -5,7 +5,7 @@
 import ExportToXlsxButton from '@/app/admin/components/ExportToXlsxButton';
 import ScanButton from '@/app/admin/components/ScanButton';
 import axios from 'axios';
-import { BarChart2, CheckCircle, List, Trash2Icon, User } from 'lucide-react';
+import { BarChart2, CheckCircle, List, Trash2Icon, User, Search } from 'lucide-react';
 import moment from 'moment';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -30,7 +30,7 @@ interface Submission {
 }
 
 const AdminDashboard: React.FC = () => {
-    const router = useRouter()
+    const router = useRouter();
     const [submissions, setSubmissions] = useState<Submission[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -44,31 +44,34 @@ const AdminDashboard: React.FC = () => {
         total_count: 0
     });
     const params = useParams();
-    useEffect(() => {
-        const fetchSubmissions = async () => {
-            try {
-                setLoading(true);
-                const formId = params['id'] || process.env.NEXT_PUBLIC_FORM_ID; // 設置您的表單 ID
-                const response = await axios.get(
-                    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/form_submissions/form/${formId}?page=${page}`
-                );
-                if (response.data.success) {
-                    console.log('page', page);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isSearching, setIsSearching] = useState(false);
 
-                    if (page == 1) {
-                        setSubmissions(response.data.form_submissions);
-                    } else {
-                        setSubmissions(submissions.concat(response.data.form_submissions))
-                    }
-                    setMeta(response.data.meta);
+    const fetchSubmissions = async (resetPage = false) => {
+        try {
+            setLoading(true);
+            const formId = params['id'] || process.env.NEXT_PUBLIC_FORM_ID;
+            const pageToFetch = resetPage ? 1 : page;
+            const response = await axios.get(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/form_submissions/form/${formId}?page=${pageToFetch}`
+            );
+            if (response.data.success) {
+                if (resetPage || pageToFetch == 1) {
+                    setSubmissions(response.data.form_submissions);
+                    setPage(1);
+                } else {
+                    setSubmissions(submissions.concat(response.data.form_submissions));
                 }
-                setLoading(false);
-            } catch (err: any) {
-                setError('無法獲取報名者信息。');
-                setLoading(false);
+                setMeta(response.data.meta);
             }
-        };
+            setLoading(false);
+        } catch (err: any) {
+            setError('無法獲取報名者信息。');
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchSubmissions();
     }, [params, page]);
 
@@ -138,7 +141,7 @@ const AdminDashboard: React.FC = () => {
             } else {
                 alert('無法手動簽到');
             }
-        } catch (err: any) { }
+        } catch (err: any) {}
     };
 
     const handleCheckout = async (qrcode_id: string) => {
@@ -154,7 +157,7 @@ const AdminDashboard: React.FC = () => {
             );
             // console.log('response', response);
             if (response.data.success) {
-                alert(response.data.message)
+                alert(response.data.message);
                 //取消簽到，更改狀態checked_in=false
                 setSubmissions((prevSubmissions) =>
                     prevSubmissions.map((submission) =>
@@ -164,11 +167,10 @@ const AdminDashboard: React.FC = () => {
                     )
                 );
             } else {
-                alert('取消簽到失敗')
+                alert('取消簽到失敗');
             }
-
         } catch (err: any) {
-            alert(err?.response?.data?.error || '取消簽到失敗')
+            alert(err?.response?.data?.error || '取消簽到失敗');
         }
     };
 
@@ -191,7 +193,7 @@ const AdminDashboard: React.FC = () => {
             } else {
                 alert('無法刪除');
             }
-        } catch (err: any) { }
+        } catch (err: any) {}
     };
 
     const handleResendEmail = async (form_submission_id: string) => {
@@ -211,7 +213,32 @@ const AdminDashboard: React.FC = () => {
             } else {
                 alert(response.data.message || '重發失敗');
             }
-        } catch (err: any) { }
+        } catch (err: any) {}
+    };
+
+    const handleSearch = async (query: string) => {
+        try {
+            setIsSearching(true);
+            const formId = params['id'] || process.env.NEXT_PUBLIC_FORM_ID;
+            const response = await axios.get(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/form_submissions/form/${formId}/search?query=${query}`
+            );
+            if (response.data.success) {
+                setSubmissions(response.data.form_submissions);
+                setMeta(response.data.meta);
+                setPage(1); // 重置頁碼
+            }
+        } catch (err) {
+            console.error('搜尋錯誤:', err);
+        } finally {
+            setIsSearching(false);
+        }
+    };
+
+    const handleReset = () => {
+        setSearchQuery('');
+        setIsSearching(false);
+        fetchSubmissions(true); // 重置並重新獲取數據
     };
 
     // if (loading) {
@@ -224,26 +251,63 @@ const AdminDashboard: React.FC = () => {
 
     return (
         <div className="container mx-auto p-4">
-            <div className='flex flex-row items-center justify-between'>
-
+            <div className="flex flex-row items-center justify-between">
                 <h1 className="text-2xl font-bold mb-4 flex items-center">
                     <List className="w-6 h-6 mr-2" /> 管理員後台
                 </h1>
-                <ExportToXlsxButton
-                    name='submissions'
-                    datas={submissions}
-                    disabled={false}
-                />
+                <ExportToXlsxButton name="submissions" datas={submissions} disabled={false} />
             </div>
             <div className="mb-4">
-                <div className='flex flex-row items-center justify-between'>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
                     <h2 className="text-xl font-semibold flex items-center">
                         <User className="w-6 h-6 mr-2" /> 報名者列表({meta?.total_count || 0})
                     </h2>
-                    {/* <h2 className="text-xl font-semibold flex items-center text-green-500">
-                        <CheckCircle className="w-4 h-4 mr-1 text-green-500" /> CheckIn
-                    </h2> */}
+
+                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                        <div className="relative flex-grow sm:flex-grow-0 sm:w-64">
+                            <input
+                                type="text"
+                                placeholder="搜尋電郵..."
+                                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onKeyPress={(e) => {
+                                    if (e.key === 'Enter' && searchQuery.trim()) {
+                                        handleSearch(searchQuery);
+                                    }
+                                }}
+                            />
+                            <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                            {isSearching && (
+                                <div className="absolute right-3 top-2.5">
+                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex gap-2 w-full sm:w-auto">
+                            <button
+                                onClick={() => searchQuery.trim() && handleSearch(searchQuery)}
+                                className="flex-1 sm:flex-none px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
+                                disabled={isSearching || !searchQuery.trim()}
+                            >
+                                <Search className="h-5 w-5" />
+                                搜尋
+                            </button>
+
+                            {searchQuery && (
+                                <button
+                                    onClick={handleReset}
+                                    className="flex-1 sm:flex-none px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center gap-2"
+                                    disabled={isSearching}
+                                >
+                                    顯示全部
+                                </button>
+                            )}
+                        </div>
+                    </div>
                 </div>
+
                 <div className="overflow-x-auto">
                     <table className="min-w-full my-4 bg-white border table-auto">
                         <thead>
@@ -251,19 +315,33 @@ const AdminDashboard: React.FC = () => {
                                 <th className="  border-b text-center w-[40px] whitespace-nowrap">
                                     編號
                                 </th>
-                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">姓名</th>
-                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">學校</th>
-                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">身份</th>
-                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">電子郵件</th>
-                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">電話號碼</th>
+                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">
+                                    姓名
+                                </th>
+                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">
+                                    學校
+                                </th>
+                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">
+                                    身份
+                                </th>
+                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">
+                                    電子郵件
+                                </th>
+                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">
+                                    電話號碼
+                                </th>
                                 <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">
                                     國家/地區
                                 </th>
                                 <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">
                                     入場狀態
                                 </th>
-                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">入場時間</th>
-                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">報名時間</th>
+                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">
+                                    入場時間
+                                </th>
+                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">
+                                    報名時間
+                                </th>
                                 <th className="py-3 px-2 sm:px-2 border-b text-left">操作</th>
                             </tr>
                         </thead>
@@ -294,7 +372,7 @@ const AdminDashboard: React.FC = () => {
                                         {submission.checked_in ? (
                                             <div className="flex flex-row items-center text-sm">
                                                 <span className="text-green-500 flex items-center">
-                                                    已入場
+                                                    已場
                                                 </span>
                                                 <div>
                                                     <CheckCircle className="w-4 h-4 ml-1 text-green-500" />
@@ -305,7 +383,9 @@ const AdminDashboard: React.FC = () => {
                                         )}
                                     </td>
                                     <td className="py-3 px-2 sm:px-2 border-b whitespace-nowrap">
-                                        {submission.check_in_at ? moment(submission.check_in_at).format('MM-DD HH:mm') : ''}
+                                        {submission.check_in_at
+                                            ? moment(submission.check_in_at).format('MM-DD HH:mm')
+                                            : ''}
                                     </td>
                                     <td className="py-3 px-2 sm:px-2 border-b whitespace-nowrap">
                                         {moment(submission.created_at).format('MM-DD HH:mm')}
@@ -350,7 +430,9 @@ const AdminDashboard: React.FC = () => {
                                             <span
                                                 className="text-blue-500 text-sm flex items-center cursor-pointer hidden"
                                                 onClick={() => {
-                                                    router.push(`/admin/form_submissions/${submission.id}?form_id=${submission.form_id}`)
+                                                    router.push(
+                                                        `/admin/form_submissions/${submission.id}?form_id=${submission.form_id}`
+                                                    );
                                                 }}
                                             >
                                                 詳細

@@ -36,7 +36,6 @@ const AdminDashboard: React.FC = () => {
     Organized By 主辦單位: 香港大學 The University of Hong Kong<br/>
     Co-Organized By 承辦單位: 澳門聯校科學展覽青年協會 Macao Joint School Science Exhibition Youth Association<br/>`;
 
-
     useEffect(() => {
         fetchAllFormData();
     }, []);
