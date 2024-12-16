@@ -46,6 +46,8 @@ const AdminDashboard: React.FC = () => {
     const params = useParams();
     const [searchQuery, setSearchQuery] = useState('');
     const [isSearching, setIsSearching] = useState(false);
+    const [formSchema, setFormSchema] = useState<any>(null);
+    const [displayOrder, setDisplayOrder] = useState<string[]>([]);
 
     const fetchSubmissions = async (resetPage = false) => {
         try {
@@ -55,6 +57,10 @@ const AdminDashboard: React.FC = () => {
             const response = await axios.get(
                 `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/form_submissions/form/${formId}?page=${pageToFetch}`
             );
+
+            console.log('API Response:', response.data);
+            console.log('Form Schema:', response.data.form?.json_schema);
+
             if (response.data.success) {
                 if (resetPage || pageToFetch == 1) {
                     setSubmissions(response.data.form_submissions);
@@ -63,6 +69,8 @@ const AdminDashboard: React.FC = () => {
                     setSubmissions(submissions.concat(response.data.form_submissions));
                 }
                 setMeta(response.data.meta);
+                setFormSchema(response.data.form?.json_schema);
+                setDisplayOrder(response.data.form?.display_order || []);
             }
             setLoading(false);
         } catch (err: any) {
@@ -312,27 +320,25 @@ const AdminDashboard: React.FC = () => {
                     <table className="min-w-full my-4 bg-white border table-auto">
                         <thead>
                             <tr className="bg-gray-200">
-                                <th className="  border-b text-center w-[40px] whitespace-nowrap">
+                                <th className="border-b text-center w-[40px] whitespace-nowrap">
                                     編號
                                 </th>
-                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">
-                                    姓名
-                                </th>
-                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">
-                                    學校
-                                </th>
-                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">
-                                    身份
-                                </th>
-                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">
-                                    電子郵件
-                                </th>
-                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">
-                                    電話號碼
-                                </th>
-                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">
-                                    國家/地區
-                                </th>
+                                {formSchema?.properties &&
+                                    displayOrder.map((key: string) => {
+                                        const property = formSchema.properties[key];
+                                        if (!property) {
+                                            console.log('Missing property for key:', key);
+                                            return null;
+                                        }
+                                        return (
+                                            <th
+                                                key={key}
+                                                className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap"
+                                            >
+                                                {property.title || key}
+                                            </th>
+                                        );
+                                    })}
                                 <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">
                                     入場狀態
                                 </th>
@@ -348,35 +354,28 @@ const AdminDashboard: React.FC = () => {
                         <tbody>
                             {submissions?.map((submission, index) => (
                                 <tr key={submission.qrcode_id} className="hover:bg-gray-100">
-                                    <td className=" border-b text-center  w-[40px]">{index + 1}</td>
-                                    <td className="py-3 px-2 sm:px-2 border-b whitespace-nowrap">
-                                        {submission.submission_data.lastName}{' '}
-                                        {submission.submission_data.firstName}
-                                    </td>
-                                    <td className="py-3 px-2 sm:px-2 border-b whitespace-nowrap">
-                                        {submission.submission_data.schoolName}
-                                    </td>
-                                    <td className="py-3 px-2 sm:px-2 border-b whitespace-nowrap">
-                                        {submission.submission_data.role}
-                                    </td>
-                                    <td className="py-3 px-2 sm:px-2 border-b">
-                                        {submission.submission_data.email}
-                                    </td>
-                                    <td className="py-3 px-2 sm:px-2 border-b">
-                                        {submission.submission_data.mobileNumber}
-                                    </td>
-                                    <td className="py-3 px-2 sm:px-2 border-b ">
-                                        {submission.submission_data.country}
-                                    </td>
+                                    <td className="border-b text-center w-[40px]">{index + 1}</td>
+                                    {displayOrder.map((key: string) => {
+                                        const value =
+                                            submission.submission_data[
+                                                key as keyof typeof submission.submission_data
+                                            ];
+                                        return (
+                                            <td
+                                                key={key}
+                                                className="py-3 px-2 sm:px-2 border-b whitespace-nowrap"
+                                            >
+                                                {Array.isArray(value) ? value.join(', ') : value}
+                                            </td>
+                                        );
+                                    })}
                                     <td className="py-3 px-2 sm:px-2 border-b whitespace-nowrap">
                                         {submission.checked_in ? (
                                             <div className="flex flex-row items-center text-sm">
                                                 <span className="text-green-500 flex items-center">
-                                                    已場
+                                                    已入場
                                                 </span>
-                                                <div>
-                                                    <CheckCircle className="w-4 h-4 ml-1 text-green-500" />
-                                                </div>
+                                                <CheckCircle className="w-4 h-4 ml-1 text-green-500" />
                                             </div>
                                         ) : (
                                             <span className="text-red-500">未入場</span>
