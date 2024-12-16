@@ -70,7 +70,7 @@ export default function Home() {
                         >
                             <p className="font-semibold text-2xl">{data?.json_schema?.title}</p>
 
-                            <p className="mt-4 font-semibold text-xl">
+                            <p className="my-4 font-semibold text-xl">
                                 {data?.meta?.display?.title || title}
                             </p>
                             <div
