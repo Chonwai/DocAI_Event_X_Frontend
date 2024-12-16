@@ -77,10 +77,12 @@ const AdminDashboard: React.FC = () => {
                         >
                             <p className="font-semibold text-2xl">{data?.json_schema?.title}</p>
 
-                            <p className="mt-4 font-semibold text-xl">{title}</p>
+                            <p className="my-4 font-semibold text-xl">
+                                {data?.meta?.display?.title || title}
+                            </p>
                             <div
                                 dangerouslySetInnerHTML={{
-                                    __html: description
+                                    __html: data?.meta?.display?.description || description
                                 }}
                             />
                             <div className="mt-2 flex justify-end">
