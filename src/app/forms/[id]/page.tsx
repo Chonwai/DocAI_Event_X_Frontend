@@ -213,15 +213,16 @@ export default function FormDetail() {
 
             {qrCode && (
                 <div className="mt-8 text-center flex flex-col items-center justify-center">
-                    <h2 className="text-xl font-semibold mb-2">您的電子門票 QR Code</h2>
+                    <h2 className="text-4xl font-extrabold text-green-600 mb-4">報名成功!</h2>
+                    <h3 className="text-xl font-semibold mb-2">您的電子門票 QR Code</h3>
                     <QRCodeCanvas value={qrCode} size={256} />
                     <p className="mt-2">請活動當天顯示此二維碼入場。</p>
                     <p className="mt-2">
                         Please show this QR code for entry on the day of the event.
                     </p>
-                    <p className="mt-2">
+                    {/* <p className="mt-2">
                         姓名 Name: {submissionData?.lastName} {submissionData?.firstName}
-                    </p>
+                    </p> */}
                 </div>
             )}
         </div>

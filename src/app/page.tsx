@@ -14,6 +14,13 @@ export interface EventForm {
         properties: any;
         dependencies: any;
     };
+    meta: {
+        display?: {
+            title?: string;
+            description?: string;
+        };
+    };
+    is_active: boolean;
 }
 
 export default function Home() {
@@ -34,7 +41,9 @@ export default function Home() {
     }, []);
 
     const fetchAllFormData = async () => {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/forms`);
+        const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/forms?status=active`
+        );
         // console.log('response.data', response.data);
         if (response.data.success) {
             setFormDatas(response.data.forms);
@@ -61,10 +70,12 @@ export default function Home() {
                         >
                             <p className="font-semibold text-2xl">{data?.json_schema?.title}</p>
 
-                            <p className="mt-4 font-semibold text-xl">{title}</p>
+                            <p className="mt-4 font-semibold text-xl">
+                                {data?.meta?.display?.title || title}
+                            </p>
                             <div
                                 dangerouslySetInnerHTML={{
-                                    __html: description
+                                    __html: data?.meta?.display?.description || description
                                 }}
                             />
                             <div className="mt-2 flex justify-end">
