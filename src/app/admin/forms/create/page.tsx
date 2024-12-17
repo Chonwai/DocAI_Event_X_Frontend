@@ -11,10 +11,25 @@ import { PlusCircle, X } from 'lucide-react';
 
 interface FormField {
     title: string;
-    type: 'string' | 'number' | 'boolean' | 'array';
+    type: 'string' | 'number' | 'integer' | 'boolean' | 'array' | 'null';
     required: boolean;
-    options?: string[];
-    widget?: 'text' | 'select' | 'radio' | 'checkboxes';
+    options?: { id: string; value: string }[];
+    widget?:
+        | 'text'
+        | 'textarea'
+        | 'select'
+        | 'radio'
+        | 'checkboxes'
+        | 'date'
+        | 'time'
+        | 'datetime'
+        | 'email'
+        | 'password'
+        | 'number'
+        | 'range';
+    format?: 'date' | 'time' | 'date-time' | 'email' | 'string' | 'uri' | 'uuid';
+    minimum?: number;
+    maximum?: number;
 }
 
 export default function CreateForm() {
@@ -44,6 +59,35 @@ export default function CreateForm() {
         setFields(fields.map((field, i) => (i === index ? { ...field, ...updates } : field)));
     };
 
+    const getTypeForWidget = (widget: string) => {
+        switch (widget) {
+            case 'number':
+            case 'range':
+                return 'number';
+            case 'checkboxes':
+                return 'array';
+            case 'radio':
+                return 'string';
+            default:
+                return 'string';
+        }
+    };
+
+    const getFormatForWidget = (widget: string) => {
+        switch (widget) {
+            case 'date':
+                return 'date';
+            case 'time':
+                return 'time';
+            case 'datetime':
+                return 'date-time';
+            case 'email':
+                return 'email';
+            default:
+                return undefined;
+        }
+    };
+
     const generateSchemas = () => {
         const jsonSchema: any = {
             type: 'object',
@@ -60,34 +104,88 @@ export default function CreateForm() {
             const fieldId = field.title.toLowerCase().replace(/\s+/g, '_');
             displayOrder.push(fieldId);
 
-            jsonSchema.properties[fieldId] = {
-                type: field.type,
-                title: field.title
-            };
-
-            if (field.options && ['select', 'radio', 'checkboxes'].includes(field.widget || '')) {
-                if (field.type === 'array') {
-                    jsonSchema.properties[fieldId].items = {
+            if (field.widget === 'checkboxes') {
+                jsonSchema.properties[fieldId] = {
+                    type: 'array',
+                    title: field.title,
+                    items: {
                         type: 'string',
-                        enum: field.options
+                        enum: field.options?.map((opt) => opt.value) || []
+                    },
+                    uniqueItems: true
+                };
+                uiSchema[fieldId] = {
+                    'ui:widget': 'checkboxes'
+                };
+            } else {
+                jsonSchema.properties[fieldId] = {
+                    type: field.type,
+                    title: field.title
+                };
+
+                if (field.widget === 'number') {
+                    if (field.minimum !== undefined) {
+                        jsonSchema.properties[fieldId].minimum = field.minimum;
+                    }
+                    if (field.maximum !== undefined) {
+                        jsonSchema.properties[fieldId].maximum = field.maximum;
+                    }
+                    uiSchema[fieldId] = {
+                        'ui:widget': 'updown'
                     };
-                } else {
-                    jsonSchema.properties[fieldId].enum = field.options;
+                } else if (field.widget === 'radio') {
+                    jsonSchema.properties[fieldId].enum =
+                        field.options?.map((opt) => opt.value) || [];
+                    uiSchema[fieldId] = {
+                        'ui:widget': 'radio'
+                    };
+                } else if (field.widget) {
+                    uiSchema[fieldId] = {
+                        'ui:widget': field.widget
+                    };
                 }
             }
 
             if (field.required) {
                 jsonSchema.required.push(fieldId);
             }
-
-            if (field.widget) {
-                uiSchema[fieldId] = {
-                    'ui:widget': field.widget
-                };
-            }
         });
 
         return { jsonSchema, uiSchema, displayOrder };
+    };
+
+    const handleSave = async () => {
+        setSubmitting(true);
+        try {
+            const { jsonSchema, uiSchema, displayOrder } = generateSchemas();
+            const response = await axios.post(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/forms`,
+                {
+                    form: {
+                        name: formTitle,
+                        description: formDescription,
+                        json_schema: jsonSchema,
+                        ui_schema: uiSchema,
+                        display_order: displayOrder
+                    }
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${process.env.NEXT_PUBLIC_BEARER_TOKEN}`
+                    }
+                }
+            );
+
+            if (response.data.success) {
+                alert('表單創建成功！');
+                router.push('/admin');
+            }
+        } catch (error) {
+            console.error(error);
+            alert('創建失敗，請稍後再試。');
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (
@@ -136,33 +234,90 @@ export default function CreateForm() {
                                         onChange={(e) =>
                                             updateField(index, {
                                                 widget: e.target.value as any,
-                                                type:
-                                                    e.target.value === 'checkboxes'
-                                                        ? 'array'
-                                                        : 'string'
+                                                type: getTypeForWidget(e.target.value)
                                             })
                                         }
                                         className="w-full p-2 border rounded"
                                     >
                                         <option value="text">文字輸入</option>
+                                        <option value="textarea">多行文字</option>
+                                        <option value="number">數字</option>
+                                        <option value="date">日期</option>
+                                        <option value="time">時間</option>
+                                        <option value="datetime">日期時間</option>
+                                        <option value="email">電子郵件</option>
                                         <option value="radio">單選按鈕</option>
                                         <option value="checkboxes">多選框</option>
                                     </select>
 
                                     {['radio', 'checkboxes'].includes(field.widget || '') && (
-                                        <textarea
-                                            value={field.options?.join('\n')}
-                                            onChange={(e) =>
-                                                updateField(index, {
-                                                    options: e.target.value
-                                                        .split('\n')
-                                                        .filter(Boolean)
-                                                })
-                                            }
-                                            className="w-full p-2 border rounded"
-                                            placeholder="每行輸入一個選項"
-                                            rows={3}
-                                        />
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className="text-sm font-medium">
+                                                    選項列表
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const newOptions = [
+                                                            ...(field.options || []),
+                                                            {
+                                                                id: Math.random()
+                                                                    .toString(36)
+                                                                    .substr(2, 9),
+                                                                value: ''
+                                                            }
+                                                        ];
+                                                        updateField(index, { options: newOptions });
+                                                    }}
+                                                    className="text-blue-500 text-sm hover:text-blue-600"
+                                                >
+                                                    + 添加選項
+                                                </button>
+                                            </div>
+                                            {field.options?.map((option, optionIndex) => (
+                                                <div
+                                                    key={option.id}
+                                                    className="flex items-center gap-2"
+                                                >
+                                                    <input
+                                                        type="text"
+                                                        value={option.value}
+                                                        onChange={(e) => {
+                                                            const newOptions = field.options?.map(
+                                                                (opt, idx) =>
+                                                                    idx === optionIndex
+                                                                        ? {
+                                                                              ...opt,
+                                                                              value: e.target.value
+                                                                          }
+                                                                        : opt
+                                                            );
+                                                            updateField(index, {
+                                                                options: newOptions
+                                                            });
+                                                        }}
+                                                        className="flex-1 p-2 border rounded"
+                                                        placeholder={`選項 ${optionIndex + 1}`}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const newOptions =
+                                                                field.options?.filter(
+                                                                    (_, idx) => idx !== optionIndex
+                                                                );
+                                                            updateField(index, {
+                                                                options: newOptions
+                                                            });
+                                                        }}
+                                                        className="text-red-500 hover:text-red-600"
+                                                    >
+                                                        <X className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
                                     )}
 
                                     <label className="flex items-center">
@@ -176,6 +331,47 @@ export default function CreateForm() {
                                         />
                                         必填欄位
                                     </label>
+
+                                    {field.widget === 'number' && (
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <div>
+                                                <label className="text-sm text-gray-600">
+                                                    最小值
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    value={field.minimum || ''}
+                                                    onChange={(e) =>
+                                                        updateField(index, {
+                                                            minimum: e.target.value
+                                                                ? Number(e.target.value)
+                                                                : undefined
+                                                        })
+                                                    }
+                                                    className="w-full p-2 border rounded"
+                                                    placeholder="最小值"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-sm text-gray-600">
+                                                    最大值
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    value={field.maximum || ''}
+                                                    onChange={(e) =>
+                                                        updateField(index, {
+                                                            maximum: e.target.value
+                                                                ? Number(e.target.value)
+                                                                : undefined
+                                                        })
+                                                    }
+                                                    className="w-full p-2 border rounded"
+                                                    placeholder="最大值"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         ))}
@@ -198,6 +394,16 @@ export default function CreateForm() {
                             disabled={submitting}
                         />
                     </div>
+                </div>
+
+                <div className="flex justify-end mt-4">
+                    <button
+                        onClick={handleSave}
+                        disabled={submitting}
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition disabled:opacity-50"
+                    >
+                        {submitting ? '保存中...' : '保存表單'}
+                    </button>
                 </div>
             </div>
         </ChakraProvider>
