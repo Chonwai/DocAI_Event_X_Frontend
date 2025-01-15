@@ -20,6 +20,7 @@ import { Editor } from '@tinymce/tinymce-react';
 
 interface FormField {
     title: string;
+    display_title: string;
     type: 'string' | 'number' | 'integer' | 'boolean' | 'array' | 'null';
     required: boolean;
     options?: { id: string; value: string }[];
@@ -154,6 +155,7 @@ export default function CreateForm() {
             ...fields,
             {
                 title: '',
+                display_title: '',
                 type: 'string',
                 required: false,
                 widget: 'text'
@@ -217,7 +219,7 @@ export default function CreateForm() {
             if (field.widget === 'checkboxes') {
                 jsonSchema.properties[fieldId] = {
                     type: 'array',
-                    title: field.title,
+                    title: field.display_title,
                     items: {
                         type: 'string',
                         enum: field.options?.map((opt) => opt.value) || []
@@ -230,7 +232,7 @@ export default function CreateForm() {
             } else {
                 jsonSchema.properties[fieldId] = {
                     type: field.type,
-                    title: field.title
+                    title: field.display_title
                 };
 
                 if (field.widget === 'number') {
@@ -438,7 +440,16 @@ export default function CreateForm() {
                                             updateField(index, { title: e.target.value })
                                         }
                                         className="w-full p-2 border rounded"
-                                        placeholder="欄位標題"
+                                        placeholder="欄位標識符 (例如: first_name)"
+                                    />
+                                    <input
+                                        type="text"
+                                        value={field.display_title}
+                                        onChange={(e) =>
+                                            updateField(index, { display_title: e.target.value })
+                                        }
+                                        className="w-full p-2 border rounded"
+                                        placeholder="顯示標題 (例如: First Name 名字)"
                                     />
                                     <select
                                         value={field.widget}
