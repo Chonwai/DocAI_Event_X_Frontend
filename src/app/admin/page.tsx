@@ -3,7 +3,7 @@
 'use client';
 
 import axios from 'axios';
-import { List, MoveRightIcon, PlusCircle } from 'lucide-react';
+import { List, MoveRightIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { EventForm } from '../page';
@@ -62,18 +62,9 @@ const AdminDashboard: React.FC = () => {
 
     return (
         <div className="container mx-auto p-4 relative">
-            <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl font-bold flex items-center">
-                    <List className="w-6 h-6 mr-2" /> 管理員後台
-                </h1>
-                <button
-                    onClick={() => router.push('/admin/forms/create')}
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition flex items-center"
-                >
-                    <PlusCircle className="w-5 h-5 mr-2" />
-                    創建新表單
-                </button>
-            </div>
+            <h1 className="text-2xl font-bold mb-4 flex items-center">
+                <List className="w-6 h-6 mr-2" /> 管理員後台
+            </h1>
             <div className="container mx-auto p-4 max-w-3xl">
                 <img src="./bg.jpeg"></img>
                 {formDatas?.map((data, index: number) => (

@@ -20,6 +20,7 @@
         "@rjsf/core": "^5.23.2",
         "@rjsf/utils": "^5.23.2",
         "@rjsf/validator-ajv8": "^5.23.2",
+        "@tinymce/tinymce-react": "^5.1.1",
         "@types/lodash": "^4.17.13",
         "@yudiel/react-qr-scanner": "^2.0.8",
         "axios": "^1.7.7",
