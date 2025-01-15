@@ -7,7 +7,7 @@ import { ChakraProvider } from '@chakra-ui/react';
 import validator from '@rjsf/validator-ajv8';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { PlusCircle, X } from 'lucide-react';
+import { PlusCircle, X, ChevronLeft } from 'lucide-react';
 
 interface FormField {
     title: string;
@@ -155,6 +155,23 @@ export default function CreateForm() {
     };
 
     const handleSave = async () => {
+        if (!formTitle.trim()) {
+            alert('請輸入表單標題');
+            return;
+        }
+
+        if (fields.length === 0) {
+            alert('請至少添加一個表單欄位');
+            return;
+        }
+
+        // 檢查所有欄位是否都有標題
+        const emptyTitleField = fields.find((field) => !field.title.trim());
+        if (emptyTitleField) {
+            alert('所有欄位都必須有標題');
+            return;
+        }
+
         setSubmitting(true);
         try {
             const { jsonSchema, uiSchema, displayOrder } = generateSchemas();
@@ -180,9 +197,9 @@ export default function CreateForm() {
                 alert('表單創建成功！');
                 router.push('/admin');
             }
-        } catch (error) {
-            console.error(error);
-            alert('創建失敗，請稍後再試。');
+        } catch (error: any) {
+            console.error('創建表單錯誤:', error);
+            alert(error.response?.data?.error || '創建失敗，請稍後再試。');
         } finally {
             setSubmitting(false);
         }
@@ -191,7 +208,15 @@ export default function CreateForm() {
     return (
         <ChakraProvider>
             <div className="container mx-auto p-4">
-                <h1 className="text-2xl font-bold mb-4">創建新表單</h1>
+                <div className="flex items-center mb-6">
+                    <button
+                        onClick={() => router.back()}
+                        className="mr-4 hover:text-gray-600 transition-colors"
+                    >
+                        <ChevronLeft className="w-6 h-6" />
+                    </button>
+                    <h1 className="text-2xl font-bold">創建新表單</h1>
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-4">
                         <div className="bg-white p-4 rounded shadow">
@@ -383,6 +408,25 @@ export default function CreateForm() {
                             <PlusCircle className="w-6 h-6 mr-2" />
                             添加新欄位
                         </button>
+
+                        <div className="fixed bottom-6 right-6">
+                            <button
+                                onClick={handleSave}
+                                disabled={submitting}
+                                className={`bg-blue-500 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-600 transition flex items-center ${
+                                    submitting ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
+                            >
+                                {submitting ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                                        保存中...
+                                    </>
+                                ) : (
+                                    <>保存表單</>
+                                )}
+                            </button>
+                        </div>
                     </div>
 
                     <div>
@@ -394,16 +438,6 @@ export default function CreateForm() {
                             disabled={submitting}
                         />
                     </div>
-                </div>
-
-                <div className="flex justify-end mt-4">
-                    <button
-                        onClick={handleSave}
-                        disabled={submitting}
-                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition disabled:opacity-50"
-                    >
-                        {submitting ? '保存中...' : '保存表單'}
-                    </button>
                 </div>
             </div>
         </ChakraProvider>
