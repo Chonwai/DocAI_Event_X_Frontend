@@ -211,13 +211,22 @@ export default function CreateForm() {
 
         const uiSchema: any = {};
         const displayOrder: string[] = [];
+        const orderedProperties: { [key: string]: any } = {};
 
+        // 直接使用fields數組的順序
         fields.forEach((field) => {
             const fieldId = field.title.toLowerCase().replace(/\s+/g, '_');
             displayOrder.push(fieldId);
+        });
+
+        // 設置 ui:order 來控制欄位順序
+        uiSchema['ui:order'] = displayOrder;
+
+        fields.forEach((field) => {
+            const fieldId = field.title.toLowerCase().replace(/\s+/g, '_');
 
             if (field.widget === 'checkboxes') {
-                jsonSchema.properties[fieldId] = {
+                orderedProperties[fieldId] = {
                     type: 'array',
                     title: field.display_title,
                     items: {
@@ -230,24 +239,23 @@ export default function CreateForm() {
                     'ui:widget': 'checkboxes'
                 };
             } else {
-                jsonSchema.properties[fieldId] = {
+                orderedProperties[fieldId] = {
                     type: field.type,
                     title: field.display_title
                 };
 
                 if (field.widget === 'number') {
                     if (field.minimum !== undefined) {
-                        jsonSchema.properties[fieldId].minimum = field.minimum;
+                        orderedProperties[fieldId].minimum = field.minimum;
                     }
                     if (field.maximum !== undefined) {
-                        jsonSchema.properties[fieldId].maximum = field.maximum;
+                        orderedProperties[fieldId].maximum = field.maximum;
                     }
                     uiSchema[fieldId] = {
                         'ui:widget': 'updown'
                     };
                 } else if (field.widget === 'radio') {
-                    jsonSchema.properties[fieldId].enum =
-                        field.options?.map((opt) => opt.value) || [];
+                    orderedProperties[fieldId].enum = field.options?.map((opt) => opt.value) || [];
                     uiSchema[fieldId] = {
                         'ui:widget': 'radio'
                     };
@@ -260,6 +268,22 @@ export default function CreateForm() {
 
             if (field.required) {
                 jsonSchema.required.push(fieldId);
+            }
+        });
+
+        // 將有序的properties賦值給jsonSchema
+        jsonSchema.properties = orderedProperties;
+
+        // 打印表單數據以便調試
+        console.log('Form Data:', {
+            displayOrder,
+            jsonSchema: {
+                ...jsonSchema,
+                properties: Object.keys(jsonSchema.properties)
+            },
+            uiSchema: {
+                ...uiSchema,
+                'ui:order': uiSchema['ui:order']
             }
         });
 
@@ -300,7 +324,7 @@ export default function CreateForm() {
         try {
             const { jsonSchema, uiSchema, displayOrder } = generateSchemas();
 
-            // 生成空的form_data
+            // 按照fields的順序生成form_data
             const formData: { [key: string]: string } = {};
             fields.forEach((field) => {
                 const fieldId = field.title.toLowerCase().replace(/\s+/g, '_');
