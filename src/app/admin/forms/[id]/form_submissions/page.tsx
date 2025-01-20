@@ -25,14 +25,7 @@ interface Submission {
     form_id: string;
     qrcode_id: string;
     submission_data: {
-        firstName: string;
-        lastName: string;
-        name: string;
-        email: string;
-        role: string;
-        mobileNumber: string;
-        country: string;
-        schoolName: string;
+        [key: string]: string | string[]; // 修改這裡以支持動態鍵值
     };
     checked_in: boolean;
     created_at: string;
@@ -457,56 +450,53 @@ const AdminDashboard: React.FC = () => {
                     <table className="min-w-full my-4 bg-white border table-auto">
                         <thead>
                             <tr className="bg-gray-200">
-                                <th className="border-b text-center w-[40px] whitespace-nowrap">
+                                <th className="border-b px-4 py-2 text-center whitespace-nowrap">
                                     編號
                                 </th>
-                                {formSchema?.properties &&
-                                    displayOrder.map((key: string) => {
-                                        const property = formSchema.properties[key];
-                                        if (!property) {
-                                            console.log('Missing property for key:', key);
-                                            return null;
-                                        }
-                                        return (
+                                {formDetails?.json_schema?.properties &&
+                                    Object.entries(formDetails.json_schema.properties).map(
+                                        ([key, field]: [string, any]) => (
                                             <th
                                                 key={key}
-                                                className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap"
+                                                className="border-b px-4 py-2 text-left whitespace-nowrap"
                                             >
-                                                {property.title || key}
+                                                <div className="font-medium">{field.title}</div>
                                             </th>
-                                        );
-                                    })}
-                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">
+                                        )
+                                    )}
+                                <th className="border-b px-4 py-2 text-left whitespace-nowrap">
                                     入場狀態
                                 </th>
-                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">
+                                <th className="border-b px-4 py-2 text-left whitespace-nowrap">
                                     入場時間
                                 </th>
-                                <th className="py-3 px-2 sm:px-2 border-b text-left whitespace-nowrap">
+                                <th className="border-b px-4 py-2 text-left whitespace-nowrap">
                                     報名時間
                                 </th>
-                                <th className="py-3 px-2 sm:px-2 border-b text-left">操作</th>
+                                <th className="border-b px-4 py-2 text-left">操作</th>
                             </tr>
                         </thead>
                         <tbody>
                             {submissions?.map((submission, index) => (
                                 <tr key={submission.qrcode_id} className="hover:bg-gray-100">
-                                    <td className="border-b text-center w-[40px]">{index + 1}</td>
-                                    {displayOrder.map((key: string) => {
-                                        const value =
-                                            submission.submission_data[
-                                                key as keyof typeof submission.submission_data
-                                            ];
-                                        return (
-                                            <td
-                                                key={key}
-                                                className="py-3 px-2 sm:px-2 border-b whitespace-nowrap"
-                                            >
-                                                {Array.isArray(value) ? value.join(', ') : value}
-                                            </td>
-                                        );
-                                    })}
-                                    <td className="py-3 px-2 sm:px-2 border-b whitespace-nowrap">
+                                    <td className="border-b px-4 py-2 text-center">{index + 1}</td>
+                                    {formDetails?.json_schema?.properties &&
+                                        Object.entries(formDetails.json_schema.properties).map(
+                                            ([key, field]: [string, any]) => {
+                                                const value = submission.submission_data[key];
+                                                return (
+                                                    <td
+                                                        key={key}
+                                                        className="border-b px-4 py-2 whitespace-nowrap"
+                                                    >
+                                                        {Array.isArray(value)
+                                                            ? value.join(', ')
+                                                            : value}
+                                                    </td>
+                                                );
+                                            }
+                                        )}
+                                    <td className="border-b px-4 py-2 whitespace-nowrap">
                                         {submission.checked_in ? (
                                             <div className="flex flex-row items-center text-sm">
                                                 <span className="text-green-500 flex items-center">
@@ -518,15 +508,15 @@ const AdminDashboard: React.FC = () => {
                                             <span className="text-red-500">未入場</span>
                                         )}
                                     </td>
-                                    <td className="py-3 px-2 sm:px-2 border-b whitespace-nowrap">
+                                    <td className="border-b px-4 py-2 whitespace-nowrap">
                                         {submission.check_in_at
                                             ? moment(submission.check_in_at).format('MM-DD HH:mm')
                                             : ''}
                                     </td>
-                                    <td className="py-3 px-2 sm:px-2 border-b whitespace-nowrap">
+                                    <td className="border-b px-4 py-2 whitespace-nowrap">
                                         {moment(submission.created_at).format('MM-DD HH:mm')}
                                     </td>
-                                    <td className="py-3 px-2 sm:px-2 border-b whitespace-nowrap ">
+                                    <td className="border-b px-4 py-2 whitespace-nowrap">
                                         <div className="flex flex-row items-center">
                                             {!submission.checked_in ? (
                                                 <span
@@ -541,7 +531,7 @@ const AdminDashboard: React.FC = () => {
                                                 </span>
                                             ) : (
                                                 <span
-                                                    className="ml-2 text-blue-500 text-sm flex items-center cursor-pointer"
+                                                    className="text-blue-500 text-sm flex items-center cursor-pointer"
                                                     onClick={() => {
                                                         if (window.confirm('確定要取消簽到嗎？')) {
                                                             handleCheckout(submission.qrcode_id);
@@ -564,17 +554,7 @@ const AdminDashboard: React.FC = () => {
                                             </span>
                                             <span className="mx-2">|</span>
                                             <span
-                                                className="text-blue-500 text-sm flex items-center cursor-pointer hidden"
-                                                onClick={() => {
-                                                    router.push(
-                                                        `/admin/form_submissions/${submission.id}?form_id=${submission.form_id}`
-                                                    );
-                                                }}
-                                            >
-                                                詳細
-                                            </span>
-                                            <span
-                                                className=" text-red-500 text-sm flex items-center cursor-pointer"
+                                                className="text-red-500 text-sm flex items-center cursor-pointer"
                                                 onClick={() => {
                                                     if (window.confirm('確定要刪除嗎？')) {
                                                         handleDeleteFormSubmission(submission.id);
