@@ -55,7 +55,7 @@ const AdminDashboard: React.FC = () => {
             const formId = params['id'] || process.env.NEXT_PUBLIC_FORM_ID;
             const pageToFetch = resetPage ? 1 : page;
             const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/form_submissions/form/${formId}?page=${pageToFetch}`
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/form_submissions/form/${formId}/search?page=${pageToFetch}`
             );
 
             console.log('API Response:', response.data);
