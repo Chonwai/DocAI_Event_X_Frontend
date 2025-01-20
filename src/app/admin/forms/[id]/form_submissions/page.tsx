@@ -5,7 +5,17 @@
 import ExportToXlsxButton from '@/app/admin/components/ExportToXlsxButton';
 import ScanButton from '@/app/admin/components/ScanButton';
 import axios from 'axios';
-import { BarChart2, CheckCircle, List, Trash2Icon, User, Search } from 'lucide-react';
+import {
+    BarChart2,
+    CheckCircle,
+    List,
+    Trash2Icon,
+    User,
+    Search,
+    Settings,
+    FileText,
+    Eye
+} from 'lucide-react';
 import moment from 'moment';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -48,6 +58,8 @@ const AdminDashboard: React.FC = () => {
     const [isSearching, setIsSearching] = useState(false);
     const [formSchema, setFormSchema] = useState<any>(null);
     const [displayOrder, setDisplayOrder] = useState<string[]>([]);
+    const [formDetails, setFormDetails] = useState<any>(null);
+    const [showFormDetails, setShowFormDetails] = useState(false);
 
     const fetchSubmissions = async (resetPage = false) => {
         try {
@@ -249,6 +261,25 @@ const AdminDashboard: React.FC = () => {
         fetchSubmissions(true); // 重置並重新獲取數據
     };
 
+    useEffect(() => {
+        fetchFormDetails();
+    }, [params]);
+
+    const fetchFormDetails = async () => {
+        try {
+            const formId = params['id'] || process.env.NEXT_PUBLIC_FORM_ID;
+            const response = await axios.get(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/forms/${formId}`
+            );
+            if (response.data.success) {
+                console.log('Form Details:', response.data.form);
+                setFormDetails(response.data.form);
+            }
+        } catch (err) {
+            console.error('獲取表單詳情失敗:', err);
+        }
+    };
+
     // if (loading) {
     //     return <div className="text-center mt-10">Loading...</div>;
     // }
@@ -259,12 +290,118 @@ const AdminDashboard: React.FC = () => {
 
     return (
         <div className="container mx-auto p-4">
-            <div className="flex flex-row items-center justify-between">
-                <h1 className="text-2xl font-bold mb-4 flex items-center">
+            <div className="flex flex-row items-center justify-between mb-4">
+                <h1 className="text-2xl font-bold flex items-center">
                     <List className="w-6 h-6 mr-2" /> 管理員後台
                 </h1>
-                <ExportToXlsxButton name="submissions" datas={submissions} disabled={false} />
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setShowFormDetails(!showFormDetails)}
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition flex items-center gap-2 text-sm"
+                    >
+                        <Eye className="w-4 h-4" />
+                        {showFormDetails ? '隱藏表單內容' : '顯示表單內容'}
+                    </button>
+                    <ExportToXlsxButton name="submissions" datas={submissions} disabled={false} />
+                </div>
             </div>
+
+            {showFormDetails && formDetails && (
+                <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-semibold flex items-center">
+                            <FileText className="w-6 h-6 mr-2" /> 表單內容
+                        </h2>
+                        <button
+                            onClick={() => router.push(`/admin/forms/${params['id']}/settings`)}
+                            className="text-gray-600 hover:text-gray-800 transition flex items-center gap-2"
+                        >
+                            <Settings className="w-5 h-5" />
+                            表單設置
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 className="font-semibold mb-2">基本信息</h3>
+                            <div className="bg-gray-50 p-4 rounded">
+                                <p className="mb-2">
+                                    <span className="font-medium">表單標題：</span>
+                                    {formDetails.json_schema?.title}
+                                </p>
+                                <div className="mb-2">
+                                    <span className="font-medium">表單描述：</span>
+                                    <div
+                                        className="mt-1"
+                                        dangerouslySetInnerHTML={{
+                                            __html: formDetails.json_schema?.description || ''
+                                        }}
+                                    />
+                                </div>
+                                <p>
+                                    <span className="font-medium">創建時間：</span>
+                                    {moment(formDetails.created_at).format('YYYY-MM-DD HH:mm')}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 className="font-semibold mb-2">表單統計</h3>
+                            <div className="bg-gray-50 p-4 rounded">
+                                <p className="mb-2">
+                                    <span className="font-medium">總提交數：</span>
+                                    {meta?.total_count || 0}
+                                </p>
+                                <p className="mb-2">
+                                    <span className="font-medium">已入場人數：</span>
+                                    {submissions.filter((s) => s.checked_in).length}
+                                </p>
+                                <p>
+                                    <span className="font-medium">未入場人數：</span>
+                                    {submissions.filter((s) => !s.checked_in).length}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="md:col-span-2">
+                            <h3 className="font-semibold mb-2">表單欄位</h3>
+                            <div className="bg-gray-50 p-4 rounded">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {formDetails.json_schema?.properties &&
+                                        Object.entries(formDetails.json_schema.properties).map(
+                                            ([key, field]: [string, any]) => {
+                                                if (!field) return null;
+                                                return (
+                                                    <div key={key} className="flex flex-col">
+                                                        <span className="font-medium">
+                                                            {field.title}
+                                                        </span>
+                                                        <span className="text-sm text-gray-600">
+                                                            類型：{field.type}
+                                                            {formDetails.json_schema.required?.includes(
+                                                                key
+                                                            ) && (
+                                                                <span className="text-red-500 ml-2">
+                                                                    必填
+                                                                </span>
+                                                            )}
+                                                        </span>
+                                                        {field.enum && (
+                                                            <span className="text-sm text-gray-600">
+                                                                選項：{field.enum.join(', ')}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                );
+                                            }
+                                        )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="mb-4">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
                     <h2 className="text-xl font-semibold flex items-center">

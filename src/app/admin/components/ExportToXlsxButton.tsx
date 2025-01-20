@@ -43,7 +43,7 @@ export default function ExportToXlsxButton({ name, disabled, datas }: ViewProps)
                     onClick={() => {
                         if (!disabled) handleExport();
                     }}
-                    className="bg-blue-500 text-white font-bold py-1 px-2 rounded hover:bg-blue-700 disabled:opacity-50"
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition flex items-center gap-2 text-sm"
                 >
                     <label className="text-xs sm:text-sm"> {'Export To Excel'}</label>
                 </button>
