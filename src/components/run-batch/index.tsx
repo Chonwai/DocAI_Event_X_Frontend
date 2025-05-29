@@ -1,19 +1,19 @@
 import { PlusIcon, XCircleIcon } from '@heroicons/react/24/outline';
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 
 import { UploadToAzure } from './utils/AzureService';
 
 import { Spinner } from '@chakra-ui/react';
 import imageCompression from 'browser-image-compression';
+import heic2any from 'heic2any';
+import Image from 'next/image';
 import ProgressModal from './ProgressModal';
 
 export type EssayUploaderProps = {
     loading?: boolean
     setOrcText?: any;
-    uploadFileUrls?: string[];
-    setUploadFileUrls?: any;
-    setUploadFiles?: (files: File[]) => void;
+    setUploadFiles: (files: File[]) => void;
 };
 
 export const UploadFilesToAzure = async (files?: File[]) => {
@@ -35,8 +35,6 @@ export const UploadFilesToAzure = async (files?: File[]) => {
 const RunBatch: FC<EssayUploaderProps> = ({
     loading,
     setOrcText,
-    uploadFileUrls,
-    setUploadFileUrls,
     setUploadFiles
 }) => {
     // processModal:
@@ -59,16 +57,10 @@ const RunBatch: FC<EssayUploaderProps> = ({
     const MAX_SIZE_MB = 4; // 4MB
 
     useEffect(() => {
-        if (uploadFileUrls) {
-            setPreviewFiles(uploadFileUrls);
-        }
-    }, [uploadFileUrls]);
-
-    useEffect(() => {
         if (selectedFiles) {
-            setUploadFiles && setUploadFiles(selectedFiles);
+            setUploadFiles(selectedFiles);
         }
-    }, [selectedFiles]);
+    }, [selectedFiles, setUploadFiles]);
 
     const optimizeImage = async (
         file: any,
@@ -91,9 +83,8 @@ const RunBatch: FC<EssayUploaderProps> = ({
         }
     };
 
-    const handleDrop = useCallback(
+    const handleDrop =
         async (acceptedFiles: File[]) => {
-            const heic2any = require('heic2any');
             setIsDragging(false);
             const totalFiles = acceptedFiles.length;
             let uploadedFiles = 0;
@@ -163,8 +154,8 @@ const RunBatch: FC<EssayUploaderProps> = ({
 
                     fileURL = URL.createObjectURL(optimizedFile);
 
-                    setSelectedFiles((prev) => [optimizedFile]);
-                    setPreviewFiles((prev) => [fileURL]);
+                    setSelectedFiles([optimizedFile]);
+                    setPreviewFiles([fileURL]);
                 }
             }
             setUploadProgress(0);
@@ -172,9 +163,7 @@ const RunBatch: FC<EssayUploaderProps> = ({
             // if (fileInputRef.current) {
             //     fileInputRef.current.value = '';
             // }
-        },
-        [fileTitle]
-    );
+        }
 
     const { getRootProps, getInputProps } = useDropzone({
         onDrop: handleDrop,
@@ -185,41 +174,6 @@ const RunBatch: FC<EssayUploaderProps> = ({
         multiple: false
     });
 
-    const onGrade = async (title: string, files?: File[]) => {
-        console.log(`Title: ${title}`);
-        console.log(files);
-        if (files && files?.length > 0) {
-            const ocrText = '';
-            const image_urls: string[] = [];
-            for (let index = 0; index < files.length; index++) {
-                const file = files[index];
-                // console.log(file);
-                // console.log(`File: ${file}`);
-                // console.log('calling azure ocr service');
-                // console.log('end calling');
-                setIsOpen(true);
-                setProgressTitle('Submiting');
-                setProgressText('Handing over the essay to the AI Assistant...');
-                setProgressPercentage((index / files.length) * (100 / 3));
-                const image_url = await UploadToAzure(file);
-                image_urls.push(image_url);
-                // console.log(`saved to ${image_url}`);
-            }
-            console.log('image_urls: ', image_urls);
-
-            // for (let index = 0; index < image_urls.length; index++) {
-            //     const url = image_urls[index];
-            //     setProgressTitle('Reading');
-            //     setProgressText('AI Assistant reviewing the essay...');
-            //     setProgressPercentage((index / image_urls.length + 1) * (100 / 3));
-            //     ocrText += '\n';
-            //     ocrText += await CallAzureOcrService(url);
-            // }
-            // setOrcText(ocrText);
-            // console.log(`ocrText: ${ocrText}`);
-        }
-        setIsOpen(false);
-    };
 
     return (
         <>
@@ -270,70 +224,64 @@ const RunBatch: FC<EssayUploaderProps> = ({
                         </div>
                     </div>
                 )}
-                {previewFiles.length > 0
-                    ? previewFiles.map((src, index) => {
-                        const isPdf =
-                            src.toLowerCase().endsWith('.pdf') ||
-                            src.toLowerCase().includes('.pdf') ||
-                            (src.startsWith('blob:') &&
-                                selectedFiles[index]?.type === 'application/pdf');
-                        return (
-                            <div key={index} className="relative">
-                                <div
-                                    className="absolute -top-2 -left-2 bg-white rounded-full p-1 shadow cursor-pointer hover:bg-gray-100"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setSelectedFiles((prev) => [
-                                            ...prev.slice(0, index),
-                                            ...prev.slice(index + 1)
-                                        ]);
-                                        setPreviewFiles((prev) => [
-                                            ...prev.slice(0, index),
-                                            ...prev.slice(index + 1)
-                                        ]);
-                                        setUploadFileUrls &&
-                                            setUploadFileUrls((prev: any) => [
-                                                ...prev.slice(0, index),
-                                                ...prev.slice(index + 1)
-                                            ]);
-                                    }}
-                                >
-                                    <XCircleIcon className="h-6 text-red-500" />
-                                </div>
-                                <div className="cursor-pointer">
-                                    {isPdf ? (
-                                        <embed
-                                            src={src}
-                                            type="application/pdf"
-                                            className="mb-4 mx-auto h-[250px] rounded-lg border"
-                                            width="100%"
-                                            height="300px"
-                                        />
-                                    ) : (
-                                        <img
-                                            src={src}
-                                            className="mb-4 mx-auto h-[250px]  object-contain rounded-lg border"
-                                            alt="Preview"
-                                        />
-                                    )}
-                                </div>
+                {previewFiles?.map((src, index) => {
+                    const isPdf =
+                        src.toLowerCase().endsWith('.pdf') ||
+                        src.toLowerCase().includes('.pdf') ||
+                        (src.startsWith('blob:') &&
+                            selectedFiles[index]?.type === 'application/pdf');
+                    return (
+                        <div key={index} className="relative">
+                            <div
+                                className="absolute -top-2 -left-2 bg-white rounded-full p-1 shadow cursor-pointer hover:bg-gray-100"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedFiles((prev) => [
+                                        ...prev.slice(0, index),
+                                        ...prev.slice(index + 1)
+                                    ]);
+                                    setPreviewFiles((prev) => [
+                                        ...prev.slice(0, index),
+                                        ...prev.slice(index + 1)
+                                    ]);
+                                }}
+                            >
+                                <XCircleIcon className="h-6 text-red-500" />
                             </div>
-                        );
-                    })
-                    : uploadProgress === 0 && (
-                        <>
-                            {/* <input {...getInputProps()} /> */}
-                            {isDragging ? (
-                                <p className="text-lg font-medium text-red-600 ">
-                                    Release to drop images here
-                                </p>
-                            ) : (
-                                <div className='w-full flex items-center justify-center flex-col '>
-                                    <PlusIcon className='w-10 text-gray-500 cursor-pointer hover:text-gray-700' />
-                                </div>
-                            )}
-                        </>
+                            <div className="cursor-pointer">
+                                {isPdf ? (
+                                    <embed
+                                        src={src}
+                                        type="application/pdf"
+                                        className="mb-4 mx-auto h-[250px] rounded-lg border"
+                                        width="100%"
+                                        height="300px"
+                                    />
+                                ) : (
+                                    <Image
+                                        src={src}
+                                        width={250}
+                                        height={250}
+                                        className="mb-4 mx-auto w-auto h-[250px]  object-contain rounded-lg border"
+                                        alt="Preview"
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    );
+                })}
+                <>
+                    {/* <input {...getInputProps()} /> */}
+                    {isDragging ? (
+                        <p className="text-lg font-medium text-red-600 ">
+                            Release to drop file here
+                        </p>
+                    ) : (
+                        <div className='w-full flex items-center justify-center flex-col '>
+                            <PlusIcon className='w-10 text-gray-500 cursor-pointer hover:text-gray-700' />
+                        </div>
                     )}
+                </>
                 <input {...getInputProps()} />
             </div>
         </>

@@ -80,7 +80,7 @@ export const CallAzureOcrService = async (image_url: string): Promise<string> =>
         console.log('come to here');
         console.log(result);
         // Operation ID is last path segment of operationLocation (a URL)
-        let operation = result.operationLocation.split('/').slice(-1)[0];
+        const operation = result.operationLocation.split('/').slice(-1)[0];
 
         // Wait for read recognition to complete
         // result.status is initially undefined, since it's the result of read
@@ -96,7 +96,7 @@ export const CallAzureOcrService = async (image_url: string): Promise<string> =>
     // Prints all text from Read result
     function printRecText(readResults: any) {
         console.log('Recognized text:');
-        var res = [];
+        const res = [];
         for (const page in readResults) {
             if (readResults.length > 1) {
                 console.log(`==== Page: ${page}`);
