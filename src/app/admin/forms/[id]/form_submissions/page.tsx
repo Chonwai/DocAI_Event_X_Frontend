@@ -5,6 +5,7 @@
 import ExportToXlsxButton from '@/app/admin/components/ExportToXlsxButton';
 import ScanButton from '@/app/admin/components/ScanButton';
 import Modal from '@/components/modal';
+import { useModalContext } from '@/context/modal-context';
 import axios from 'axios';
 import {
     BarChart2,
@@ -56,6 +57,7 @@ const AdminDashboard: React.FC = () => {
     const [showFormDetails, setShowFormDetails] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [showModal, setShowModal] = useState(false);
+    const { setShowConfirmDelete } = useModalContext()
 
     const fetchSubmissions = async (resetPage = false) => {
         try {
@@ -308,6 +310,31 @@ const AdminDashboard: React.FC = () => {
 
     );
 
+    const onClickDelete = () => {
+        setShowConfirmDelete({
+            payload: {
+                content: '確定刪除表單嗎?'
+            },
+            onSaveCallback: async (newPayload) => {
+                console.log('newPayload');
+                const formId = params['id'] || process.env.NEXT_PUBLIC_FORM_ID;
+                const response = await axios.delete(
+                    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/forms/${formId}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${process.env.NEXT_PUBLIC_BEARER_TOKEN}`
+                        }
+                    }
+                )
+                if (response.data.success) {
+                    // console.log('Form Details:', response.data.form);
+                    router.back()
+                    router.refresh()
+                }
+            }
+        })
+    }
+
     if (error) {
         return <div className="text-red-500 text-center mt-10">{error}</div>;
     }
@@ -336,13 +363,22 @@ const AdminDashboard: React.FC = () => {
                         <h2 className="text-xl font-semibold flex items-center">
                             <FileText className="w-6 h-6 mr-2" /> 表單內容
                         </h2>
-                        <button
-                            onClick={() => router.push(`/admin/forms/${params['id']}/settings`)}
-                            className="text-gray-600 hover:text-gray-800 transition flex items-center gap-2"
-                        >
-                            <Settings className="w-5 h-5" />
-                            表單設置
-                        </button>
+                        <div className='flex flex-row items-end space-x-4'>
+                            <button
+                                onClick={() => router.push(`/admin/forms/${params['id']}/settings`)}
+                                className="text-gray-600 hover:text-gray-800 transition flex items-center gap-2"
+                            >
+                                <Settings className="w-5 h-5" />
+                                表單設置
+                            </button>
+                            <button
+                                onClick={onClickDelete}
+                                className="text-red-600 hover:text-red-800 transition flex items-center gap-2"
+                            >
+                                <Trash2Icon className="w-5 h-5" />
+                                刪除表單
+                            </button>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -515,7 +551,7 @@ const AdminDashboard: React.FC = () => {
                                         Object.entries(formDetails.json_schema.properties).map(
                                             ([key, field]: [string, any]) => {
                                                 // console.log('key', formDetails?.ui_schema[key]['ui:widget']);
-                                                const widget = formDetails?.ui_schema[key]['ui:widget']
+                                                const widget = formDetails?.ui_schema[key]?.['ui:widget']
                                                 const value = submission.submission_data[key];
                                                 if (widget == 'file') {
                                                     return (

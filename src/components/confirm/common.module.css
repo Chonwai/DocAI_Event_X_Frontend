@@ -1,0 +1,9 @@
+.wrapper-danger {
+    background: linear-gradient(180deg, rgba(217, 45, 32, 0.05) 0%, rgba(217, 45, 32, 0) 24.02%),
+        #f9fafb;
+}
+
+.wrapper-success {
+    background: linear-gradient(180deg, rgba(3, 152, 85, 0.05) 0%, rgba(3, 152, 85, 0) 22.44%),
+        #f9fafb;
+}

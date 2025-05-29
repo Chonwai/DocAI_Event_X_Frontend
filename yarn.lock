@@ -4985,6 +4985,11 @@ use-callback-ref@^1.3.2, use-callback-ref@^1.3.3:
   dependencies:
     tslib "^2.0.0"
 
+use-context-selector@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/use-context-selector/-/use-context-selector-2.0.0.tgz#3b5dafec7aa947c152d4f0aa7f250e99a205df3d"
+  integrity sha512-owfuSmUNd3eNp3J9CdDl0kMgfidV+MkDvHPpvthN5ThqM+ibMccNE0k+Iq7TWC6JPFvGZqanqiGCuQx6DyV24g==
+
 use-isomorphic-layout-effect@^1.1.2, use-isomorphic-layout-effect@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/use-isomorphic-layout-effect/-/use-isomorphic-layout-effect-1.2.0.tgz#afb292eb284c39219e8cb8d3d62d71999361a21d"

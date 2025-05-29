@@ -94,7 +94,13 @@ const AdminDashboard: React.FC = () => {
                                     __html: data?.meta?.display?.description || description
                                 }}
                             />
-                            <div className="mt-2 flex justify-end">
+                            <div className="mt-2 flex items-center justify-between">
+                                {data?.is_active ?
+
+                                    <label className=' text-green-500 text-sm'>已發佈</label>
+                                    :
+                                    <label className=' text-red-500 text-sm'>未發佈</label>
+                                }
                                 <button
                                     className="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
                                     onClick={() => {
