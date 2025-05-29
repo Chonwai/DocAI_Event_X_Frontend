@@ -1,13 +1,15 @@
 'use client';
 
+import RunBatch, { UploadFilesToAzure } from '@/components/run-batch';
+import { ChakraProvider } from '@chakra-ui/react';
+import { extendTheme } from '@chakra-ui/theme-utils';
+import Form from '@rjsf/chakra-ui';
+import { WidgetProps } from '@rjsf/utils';
+import validator from '@rjsf/validator-ajv8';
 import axios from 'axios';
 import { useParams, useRouter } from 'next/navigation';
 import { QRCodeCanvas } from 'qrcode.react';
 import { useEffect, useState } from 'react';
-import { ChakraProvider } from '@chakra-ui/react';
-import { extendTheme } from '@chakra-ui/theme-utils';
-import Form from '@rjsf/chakra-ui';
-import validator from '@rjsf/validator-ajv8';
 
 const theme = extendTheme({});
 
@@ -35,7 +37,7 @@ export default function FormDetail() {
     const [submissionData, setSubmissionData] = useState<any>();
     const [loading, setLoading] = useState<boolean>(true);
     const [submitting, setSubmitting] = useState<boolean>(false);
-
+    const [uploadFiles, setUploadFiles] = useState<File[]>([]);
     useEffect(() => {
         fetchFormDataById();
     }, [params]);
@@ -55,6 +57,8 @@ export default function FormDetail() {
     };
 
     const onSubmit = async ({ formData: submitData }: any) => {
+        console.log('submitData', submitData);
+
         setSubmissionData(submitData);
         setSubmitting(true);
         try {
@@ -72,6 +76,51 @@ export default function FormDetail() {
         }
     };
 
+    // 自定义文件上传组件
+    const CustomFileWidget = (props: WidgetProps) => {
+        const { name, required, value, onChange, disabled } = props;
+        console.log('props', props);
+        const [loading, setLoading] = useState(false)
+
+        const [uploadFiles, setUploadFiles] = useState<File[]>([]);
+
+
+        useEffect(() => {
+            if (uploadFiles) {
+                // console.log('uploadFiles', uploadFiles);
+                uploadFileToServer(uploadFiles)
+            }
+        }, [uploadFiles]);
+
+        const uploadFileToServer = async (files: any[]) => {
+            let upload_file_urls = ''
+            if (files.length > 0) {
+                setLoading(true)
+                upload_file_urls = await UploadFilesToAzure(files);
+                setLoading(false)
+            }
+            onChange(upload_file_urls);
+
+        }
+
+
+        return (
+            <div >
+                <div className='flex flex-row items-center'>
+                    <label className="block text-md font-medium text-[#1a202c]">
+                        {props.label}
+                    </label>
+                    {required && <label className="block text-md font-medium text-[#e53e3e] ml-2">
+                        *
+                    </label>}
+                </div>
+                <RunBatch
+                    loading={loading}
+                    setUploadFiles={setUploadFiles}
+                />
+            </div>
+        );
+    };
     if (loading) {
         return <div className="text-center mt-10">Loading...</div>;
     }
@@ -92,6 +141,7 @@ export default function FormDetail() {
                         validator={validator}
                         onSubmit={onSubmit}
                         disabled={submitting}
+                        widgets={{ file: CustomFileWidget }} // 这里注册自定义 file widget
                     />
                 )}
                 {qrCode && (

@@ -1,22 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 // import Form from '@rjsf/core';
-import Form from '@rjsf/chakra-ui';
 import {
     ChakraProvider,
     Modal,
-    ModalOverlay,
+    ModalBody,
+    ModalCloseButton,
     ModalContent,
     ModalHeader,
-    ModalBody,
-    ModalCloseButton
+    ModalOverlay
 } from '@chakra-ui/react';
+import Form from '@rjsf/chakra-ui';
 import validator from '@rjsf/validator-ajv8';
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
-import { PlusCircle, X, ChevronLeft } from 'lucide-react';
 import { Editor } from '@tinymce/tinymce-react';
+import axios from 'axios';
+import { ChevronLeft, PlusCircle, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface FormField {
     title: string;
@@ -25,18 +25,19 @@ interface FormField {
     required: boolean;
     options?: { id: string; value: string }[];
     widget?:
-        | 'text'
-        | 'textarea'
-        | 'select'
-        | 'radio'
-        | 'checkboxes'
-        | 'date'
-        | 'time'
-        | 'datetime'
-        | 'email'
-        | 'password'
-        | 'number'
-        | 'range';
+    | 'text'
+    | 'textarea'
+    | 'select'
+    | 'radio'
+    | 'checkboxes'
+    | 'date'
+    | 'time'
+    | 'datetime'
+    | 'email'
+    | 'password'
+    | 'number'
+    | 'range'
+    | 'file';
     format?: 'date' | 'time' | 'date-time' | 'email' | 'string' | 'uri' | 'uuid';
     minimum?: number;
     maximum?: number;
@@ -494,6 +495,7 @@ export default function CreateForm() {
                                         <option value="email">電子郵件</option>
                                         <option value="radio">單選按鈕</option>
                                         <option value="checkboxes">多選框</option>
+                                        <option value="file">文件</option>
                                     </select>
 
                                     {['radio', 'checkboxes'].includes(field.widget || '') && (
@@ -534,9 +536,9 @@ export default function CreateForm() {
                                                                 (opt, idx) =>
                                                                     idx === optionIndex
                                                                         ? {
-                                                                              ...opt,
-                                                                              value: e.target.value
-                                                                          }
+                                                                            ...opt,
+                                                                            value: e.target.value
+                                                                        }
                                                                         : opt
                                                             );
                                                             updateField(index, {
@@ -655,8 +657,8 @@ export default function CreateForm() {
                                             onChange={(e) => {
                                                 const template =
                                                     DEFAULT_EMAIL_TEMPLATES[
-                                                        e.target
-                                                            .value as keyof typeof DEFAULT_EMAIL_TEMPLATES
+                                                    e.target
+                                                        .value as keyof typeof DEFAULT_EMAIL_TEMPLATES
                                                     ];
                                                 setSelectedTemplate(e.target.value);
                                                 setEmailTemplate((prev) => ({
@@ -819,9 +821,8 @@ export default function CreateForm() {
                             <button
                                 onClick={handleSave}
                                 disabled={submitting}
-                                className={`bg-blue-500 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-600 transition flex items-center ${
-                                    submitting ? 'opacity-50 cursor-not-allowed' : ''
-                                }`}
+                                className={`bg-blue-500 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-600 transition flex items-center ${submitting ? 'opacity-50 cursor-not-allowed' : ''
+                                    }`}
                             >
                                 {submitting ? (
                                     <>
