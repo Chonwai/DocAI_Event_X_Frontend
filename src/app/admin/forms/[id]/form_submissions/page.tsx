@@ -4,17 +4,18 @@
 
 import ExportToXlsxButton from '@/app/admin/components/ExportToXlsxButton';
 import ScanButton from '@/app/admin/components/ScanButton';
+import Modal from '@/components/modal';
 import axios from 'axios';
 import {
     BarChart2,
     CheckCircle,
+    Eye,
+    FileText,
     List,
-    Trash2Icon,
-    User,
     Search,
     Settings,
-    FileText,
-    Eye
+    Trash2Icon,
+    User
 } from 'lucide-react';
 import moment from 'moment';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
@@ -53,6 +54,8 @@ const AdminDashboard: React.FC = () => {
     const [displayOrder, setDisplayOrder] = useState<string[]>([]);
     const [formDetails, setFormDetails] = useState<any>(null);
     const [showFormDetails, setShowFormDetails] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [showModal, setShowModal] = useState(false);
 
     const fetchSubmissions = async (resetPage = false) => {
         try {
@@ -154,7 +157,7 @@ const AdminDashboard: React.FC = () => {
             } else {
                 alert('無法手動簽到');
             }
-        } catch (err: any) {}
+        } catch (err: any) { }
     };
 
     const handleCheckout = async (qrcode_id: string) => {
@@ -206,7 +209,7 @@ const AdminDashboard: React.FC = () => {
             } else {
                 alert('無法刪除');
             }
-        } catch (err: any) {}
+        } catch (err: any) { }
     };
 
     const handleResendEmail = async (form_submission_id: string) => {
@@ -226,7 +229,7 @@ const AdminDashboard: React.FC = () => {
             } else {
                 alert(response.data.message || '重發失敗');
             }
-        } catch (err: any) {}
+        } catch (err: any) { }
     };
 
     const handleSearch = async (query: string) => {
@@ -265,7 +268,7 @@ const AdminDashboard: React.FC = () => {
                 `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/forms/${formId}`
             );
             if (response.data.success) {
-                console.log('Form Details:', response.data.form);
+                // console.log('Form Details:', response.data.form);
                 setFormDetails(response.data.form);
             }
         } catch (err) {
@@ -277,13 +280,41 @@ const AdminDashboard: React.FC = () => {
     //     return <div className="text-center mt-10">Loading...</div>;
     // }
 
+    // 渲染 Modal
+    const renderPreviewModal = () => (
+        <Modal
+            isShow={showModal}
+            onClose={() => { setShowModal(false) }}
+            wrapperClassName="z-50"
+            className={'z-50'}
+            closable
+        >
+            <div
+                onClick={(e) => {
+                    e.stopPropagation();
+                    e.stopPropagation();
+                    e.nativeEvent.stopImmediatePropagation();
+                }}
+            >
+                <div className="p-2 flex items-center justify-center">
+                    {previewUrl?.toLowerCase().endsWith('.pdf') ? (
+                        <embed src={previewUrl} type="application/pdf" width="500px" height="700px" />
+                    ) : (
+                        <img src={previewUrl || ''} alt="preview" className="max-w-full max-h-[700px] rounded" />
+                    )}
+                </div>
+            </div>
+        </Modal>
+
+    );
+
     if (error) {
         return <div className="text-red-500 text-center mt-10">{error}</div>;
     }
 
     return (
         <div className="container mx-auto p-4">
-            <div className="flex flex-row items-center justify-between mb-4">
+            <div className="flex flex-row items-center justify-between mb-4 flex-wrap">
                 <h1 className="text-2xl font-bold flex items-center">
                     <List className="w-6 h-6 mr-2" /> 管理員後台
                 </h1>
@@ -374,10 +405,10 @@ const AdminDashboard: React.FC = () => {
                                                             {formDetails.json_schema.required?.includes(
                                                                 key
                                                             ) && (
-                                                                <span className="text-red-500 ml-2">
-                                                                    必填
-                                                                </span>
-                                                            )}
+                                                                    <span className="text-red-500 ml-2">
+                                                                        必填
+                                                                    </span>
+                                                                )}
                                                         </span>
                                                         {field.enum && (
                                                             <span className="text-sm text-gray-600">
@@ -483,12 +514,31 @@ const AdminDashboard: React.FC = () => {
                                     {formDetails?.json_schema?.properties &&
                                         Object.entries(formDetails.json_schema.properties).map(
                                             ([key, field]: [string, any]) => {
+                                                // console.log('key', formDetails?.ui_schema[key]['ui:widget']);
+                                                const widget = formDetails?.ui_schema[key]['ui:widget']
                                                 const value = submission.submission_data[key];
+                                                if (widget == 'file') {
+                                                    return (
+                                                        <td
+                                                            key={key}
+                                                            className='px-4 py-2'>
+                                                            <label className=' text-blue-500 cursor-pointer underline'
+                                                                onClick={() => {
+                                                                    // 支持多文件时可自行拆分
+                                                                    const url = Array.isArray(value) ? value[0] : value;
+                                                                    setPreviewUrl(url);
+                                                                    setShowModal(true);
+                                                                }}
+                                                            >查看</label>
+                                                        </td>
+                                                    )
+                                                }
                                                 return (
                                                     <td
                                                         key={key}
                                                         className="border-b px-4 py-2 whitespace-nowrap"
                                                     >
+
                                                         {Array.isArray(value)
                                                             ? value.join(', ')
                                                             : value}
@@ -581,6 +631,7 @@ const AdminDashboard: React.FC = () => {
             <div className="mt-4 flex justify-end fixed bottom-6 right-2">
                 <ScanButton />
             </div>
+            {renderPreviewModal()}
         </div>
     );
 };
