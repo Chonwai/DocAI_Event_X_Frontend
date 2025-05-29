@@ -1,9 +1,3 @@
-/* eslint-disable import/no-mutable-exports */
-
-export const API_PREFIX = process.env.NEXT_PUBLIC_API_SERVER;
-export const PUBLIC_API_PREFIX = process.env.NEXT_PUBLIC_API_SERVER;
-export const PUBLIC_API_SPEAKING = 'https://speaking.docai.net';
-
 export const LOCALE_COOKIE_NAME = 'locale';
 export const DEFAULT_VALUE_MAX_LEN = 48;
 
