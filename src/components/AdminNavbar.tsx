@@ -1,13 +1,16 @@
-import Link from 'next/link';
-import { Home, User, Settings } from 'lucide-react';
+// components/AdminNavbar.tsx
 
-export default function Navbar() {
+import Link from 'next/link';
+import { User, CheckCircle2, LogOut } from 'lucide-react';
+import { signOut } from 'next-auth/react';
+
+const AdminNavbar: React.FC = () => {
     return (
         <nav className="bg-gray-800 text-white p-4 flex justify-between">
             <div className="flex items-center space-x-4">
-                <Link legacyBehavior href="/">
+                <Link legacyBehavior href="/admin/checkin">
                     <a className="flex items-center hover:text-gray-400 transition">
-                        <Home className="w-5 h-5 mr-1" /> 首頁
+                        <CheckCircle2 className="w-5 h-5 mr-1" /> Check-In
                     </a>
                 </Link>
                 <Link legacyBehavior href="/admin">
@@ -15,14 +18,18 @@ export default function Navbar() {
                         <User className="w-5 h-5 mr-1" /> 管理員
                     </a>
                 </Link>
+                {/* 添加更多管理員導航鏈接 */}
             </div>
             <div className="flex items-center space-x-4">
-                <Link legacyBehavior href="/settings">
-                    <a className="flex items-center hover:text-gray-400 transition">
-                        <Settings className="w-5 h-5 mr-1" /> 設定
-                    </a>
-                </Link>
+                <button
+                    onClick={() => signOut()}
+                    className="flex items-center hover:text-gray-400 transition"
+                >
+                    <LogOut className="w-5 h-5 mr-1" /> 登出
+                </button>
             </div>
         </nav>
     );
-}
+};
+
+export default AdminNavbar;

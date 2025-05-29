@@ -1,114 +1,97 @@
-import { useForm } from 'react-hook-form';
+'use client';
+
 import axios from 'axios';
-import { useState } from 'react';
-import QRCode from 'qrcode.react';
-import { CheckCircle, Mail, Phone, User, Globe } from 'lucide-react'; // 引入所需的圖標
+import { MoveRightIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+export interface EventForm {
+    id: string;
+    name: string;
+    description: string;
+    json_schema: {
+        type: string;
+        title: string;
+        properties: any;
+        dependencies: any;
+    };
+    meta: {
+        display?: {
+            title?: string;
+            description?: string;
+        };
+    };
+    is_active: boolean;
+}
 
 export default function Home() {
-    const {
-        register,
-        handleSubmit,
-        formState: { errors }
-    } = useForm();
-    const [qrCode, setQrCode] = useState(null);
-    const [formId, setFormId] = useState(null);
+    const router = useRouter();
+    const [formDatas, setFormDatas] = useState<EventForm[]>([]);
+    const title = `HKU Information Day 2024 in Macau 香港大學本科入學資訊日 2024（澳門）`;
+    const description = `
+    Date 日期：9 November 2024 (Saturday)​ 2024年11月9日（星期六）<br/>
+    Time 時間： 9:00am-6:00pm<br/>
+    Venue 地點：Chan Sui Ki Perpetual Help College, 28, Estrada da Vitoria, Macau<br/>
+    澳門得勝馬路廿八號陳瑞祺永援中學<br/>
+    <br/>
+    Organized By 主辦單位: 香港大學 The University of Hong Kong<br/>
+    Co-Organized By 承辦單位: 澳門聯校科學展覽青年協會 Macao Joint School Science Exhibition Youth Association<br/>`;
 
-    const onSubmit = async (data) => {
-        try {
-            // 假設您已經有一個表單 ID
-            const formId = 'YOUR_FORM_ID'; // 替換為實際表單 ID
-            const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/forms/${formId}/submissions`,
-                { form_submission: { submission_data: data } }
-            );
-            setQrCode(response.data.qrcode_id);
-        } catch (error) {
-            console.error(error);
+    useEffect(() => {
+        fetchAllFormData();
+    }, []);
+
+    const fetchAllFormData = async () => {
+        const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/forms?status=active`
+        );
+        // console.log('response.data', response.data);
+        if (response.data.success) {
+            setFormDatas(response.data.forms);
+        } else {
+            alert(response.data.error?.toString() || 'error');
         }
     };
 
+    const handleClickForm = (formData: any) => {
+        router.push(`/forms/${formData?.id}`);
+    };
+
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">活動報名表</h1>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <div>
-                    <label className="block text-sm font-medium mb-1">
-                        姓名 <span className="text-red-500">*</span>
-                    </label>
-                    <div className="flex items-center border rounded">
-                        <User className="w-5 h-5 text-gray-400 ml-2" />
-                        <input
-                            name="name"
-                            {...register('name', { required: true })}
-                            className="flex-1 p-2 focus:outline-none"
-                            placeholder="您的姓名"
-                        />
-                    </div>
-                    {errors.name && <span className="text-red-500 text-sm">這是必填欄位</span>}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium mb-1">
-                        電子郵件 <span className="text-red-500">*</span>
-                    </label>
-                    <div className="flex items-center border rounded">
-                        <Mail className="w-5 h-5 text-gray-400 ml-2" />
-                        <input
-                            name="email"
-                            type="email"
-                            {...register('email', { required: true })}
-                            className="flex-1 p-2 focus:outline-none"
-                            placeholder="您的電子郵件"
-                        />
-                    </div>
-                    {errors.email && <span className="text-red-500 text-sm">這是必填欄位</span>}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium mb-1">電話號碼</label>
-                    <div className="flex items-center border rounded">
-                        <Phone className="w-5 h-5 text-gray-400 ml-2" />
-                        <input
-                            name="phone_number"
-                            {...register('phone_number')}
-                            className="flex-1 p-2 focus:outline-none"
-                            placeholder="您的電話號碼"
-                        />
-                    </div>
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium mb-1">國家</label>
-                    <div className="flex items-center border rounded">
-                        <Globe className="w-5 h-5 text-gray-400 ml-2" />
-                        <select
-                            name="country"
-                            {...register('country')}
-                            className="flex-1 p-2 focus:outline-none"
-                            defaultValue="USA"
+        <>
+            <div className="container mx-auto p-4 max-w-3xl">
+                <img src="./bg.jpeg"></img>
+                {formDatas?.map((data, index: number) => (
+                    <div key={index} className="flex flex-col mb-4 my-4">
+                        <div
+                            onClick={() => {
+                                handleClickForm(data);
+                            }}
+                            className="cursor-pointer p-2  "
                         >
-                            <option value="USA">USA</option>
-                            <option value="Canada">Canada</option>
-                            <option value="Others">Others</option>
-                        </select>
+                            <p className="font-semibold text-2xl">{data?.json_schema?.title}</p>
+
+                            <p className="my-4 font-semibold text-xl">
+                                {data?.meta?.display?.title || title}
+                            </p>
+                            <div
+                                dangerouslySetInnerHTML={{
+                                    __html: data?.meta?.display?.description || description
+                                }}
+                            />
+                            <div className="mt-2 flex justify-end">
+                                <button
+                                    className="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+                                    onClick={() => {
+                                        handleClickForm(data);
+                                    }}
+                                >
+                                    <MoveRightIcon size={20} />
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-
-                <button
-                    type="submit"
-                    className="flex items-center justify-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
-                >
-                    提交 <CheckCircle className="w-5 h-5 ml-2" />
-                </button>
-            </form>
-
-            {qrCode && (
-                <div className="mt-8 text-center">
-                    <h2 className="text-xl font-semibold mb-2">您的電子門票 QR Code</h2>
-                    <QRCode value={qrCode} size={256} />
-                    <p className="mt-2">QR Code ID: {qrCode}</p>
-                </div>
-            )}
-        </div>
+                ))}
+            </div>
+        </>
     );
 }

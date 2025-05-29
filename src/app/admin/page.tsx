@@ -1,85 +1,118 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { User, List, BarChart2, LogOut } from 'lucide-react';
+// pages/admin/page.tsx
 
-export default function Admin() {
-    const [submissions, setSubmissions] = useState([]);
+'use client';
+
+import axios from 'axios';
+import { List, MoveRightIcon, PlusCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { EventForm } from '../page';
+import ScanButton from './components/ScanButton';
+
+interface Submission {
+    qrcode_id: string;
+    submission_data: {
+        name: string;
+        email: string;
+        phone_number: string;
+        country: string;
+    };
+    checked_in: boolean;
+}
+
+const AdminDashboard: React.FC = () => {
+    const [submissions, setSubmissions] = useState<Submission[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const router = useRouter();
+    const [formDatas, setFormDatas] = useState<EventForm[]>([]);
+
+    const title = `HKU Information Day 2024 in Macau 香港大學本科入學資訊日 2024（澳門）`;
+    const description = `
+    Date 日期：9 November 2024 (Saturday)​ 2024年11月9日（星期六）<br/>
+    Time 時間： 9:00am-6:00pm<br/>
+    Venue 地點：Chan Sui Ki Perpetual Help College, 28, Estrada da Vitoria, Macau<br/>
+    澳門得勝馬路廿八號陳瑞祺永援中學<br/>
+    <br/>
+    Organized By 主辦單位: 香港大學 The University of Hong Kong<br/>
+    Co-Organized By 承辦單位: 澳門聯校科學展覽青年協會 Macao Joint School Science Exhibition Youth Association<br/>`;
 
     useEffect(() => {
-        // 假設您已經有一個表單 ID
-        const formId = 'YOUR_FORM_ID'; // 替換為實際表單 ID
-        axios
-            .get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/forms/${formId}/submissions`)
-            .then((response) => {
-                setSubmissions(response.data);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+        fetchAllFormData();
     }, []);
 
-    return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4 flex items-center">
-                <List className="w-6 h-6 mr-2" /> 管理員後台
-            </h1>
+    const fetchAllFormData = async () => {
+        setLoading(true);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/forms`);
+        // console.log('response.data', response.data);
+        setLoading(false);
+        if (response.data.success) {
+            setFormDatas(response.data.forms);
+        } else {
+            alert(response.data.error?.toString() || 'error');
+        }
+    };
 
-            <div className="mb-4">
-                <button className="flex items-center bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">
-                    <LogOut className="w-5 h-5 mr-2" /> 登出
+    const handleClickForm = (formData: any) => {
+        router.push(`/admin/forms/${formData?.id}/form_submissions`);
+    };
+
+    if (loading) {
+        return <div className="text-center mt-10">Loading...</div>;
+    }
+
+    return (
+        <div className="container mx-auto p-4 relative">
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="text-2xl font-bold flex items-center">
+                    <List className="w-6 h-6 mr-2" /> 管理員後台
+                </h1>
+                <button
+                    onClick={() => router.push('/admin/forms/create')}
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition flex items-center"
+                >
+                    <PlusCircle className="w-5 h-5 mr-2" />
+                    創建新表單
                 </button>
             </div>
+            <div className="container mx-auto p-4 max-w-3xl">
+                <img src="./bg.jpeg"></img>
+                {formDatas?.map((data, index: number) => (
+                    <div key={index} className="flex flex-col mb-4 my-4">
+                        <div
+                            onClick={() => {
+                                handleClickForm(data);
+                            }}
+                            className="cursor-pointer p-2  "
+                        >
+                            <p className="font-semibold text-2xl">{data?.json_schema?.title}</p>
 
-            <div className="mb-6">
-                <h2 className="text-xl font-semibold flex items-center">
-                    <User className="w-6 h-6 mr-2" /> 報名者列表
-                </h2>
-                <table className="min-w-full bg-white border">
-                    <thead>
-                        <tr>
-                            <th className="py-2 px-4 border-b">姓名</th>
-                            <th className="py-2 px-4 border-b">電子郵件</th>
-                            <th className="py-2 px-4 border-b">電話號碼</th>
-                            <th className="py-2 px-4 border-b">國家</th>
-                            <th className="py-2 px-4 border-b">入場狀態</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {submissions.map((submission) => (
-                            <tr key={submission.qrcode_id}>
-                                <td className="py-2 px-4 border-b">
-                                    {submission.submission_data.name}
-                                </td>
-                                <td className="py-2 px-4 border-b">
-                                    {submission.submission_data.email}
-                                </td>
-                                <td className="py-2 px-4 border-b">
-                                    {submission.submission_data.phone_number}
-                                </td>
-                                <td className="py-2 px-4 border-b">
-                                    {submission.submission_data.country}
-                                </td>
-                                <td className="py-2 px-4 border-b">
-                                    {submission.checked_in ? (
-                                        <span className="text-green-500 flex items-center">
-                                            已入場 <CheckCircle className="w-4 h-4 ml-1" />
-                                        </span>
-                                    ) : (
-                                        <span className="text-red-500">未入場</span>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                            <p className="my-4 font-semibold text-xl">
+                                {data?.meta?.display?.title || title}
+                            </p>
+                            <div
+                                dangerouslySetInnerHTML={{
+                                    __html: data?.meta?.display?.description || description
+                                }}
+                            />
+                            <div className="mt-2 flex justify-end">
+                                <button
+                                    className="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+                                    onClick={() => {
+                                        handleClickForm(data);
+                                    }}
+                                >
+                                    <MoveRightIcon size={20} />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ))}
             </div>
-
-            <div>
-                <h2 className="text-xl font-semibold flex items-center">
-                    <BarChart2 className="w-6 h-6 mr-2" /> 統計數據
-                </h2>
-                {/* 這裡可以集成圖表庫來展示統計數據 */}
+            <div className="mt-4 flex justify-end fixed bottom-6 right-2">
+                <ScanButton />
             </div>
         </div>
     );
-}
+};
+
+export default AdminDashboard;
