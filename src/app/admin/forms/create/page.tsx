@@ -449,7 +449,7 @@ export default function CreateForm() {
                             </div>
                             <input
                                 type="text"
-                                value={meta.display.title}
+                                value={meta?.display?.title || ''}
                                 onChange={(e) => setMeta({
                                     ...meta,
                                     display: {
@@ -471,7 +471,7 @@ export default function CreateForm() {
                             <Editor
                                 id='description'
                                 apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
-                                value={meta?.display?.description}
+                                value={meta?.display?.description || ''}
                                 init={{
                                     height: 400,
                                     menubar: true,

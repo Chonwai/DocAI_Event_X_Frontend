@@ -160,7 +160,7 @@ export default function CreateForm() {
         setFormDescription(form.description || '');
         setIsActive(form.is_active || false);
         setEmailEnabled(form.email_enabled || false);
-        setMeta(form.meta)
+        setMeta(form?.meta)
 
         // 解析 fields，按 display_order 排序
         if (form.json_schema && form.json_schema.properties) {
@@ -517,11 +517,11 @@ export default function CreateForm() {
                             </div>
                             <input
                                 type="text"
-                                value={meta.display.title}
+                                value={meta?.display?.title || ''}
                                 onChange={(e) => setMeta({
                                     ...meta,
                                     display: {
-                                        ...meta.display,
+                                        ...meta?.display,
                                         title: e.target.value
                                     }
                                 })}
@@ -539,7 +539,7 @@ export default function CreateForm() {
                             <Editor
                                 id='description'
                                 apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
-                                value={meta?.display?.description}
+                                value={meta?.display?.description || ''}
                                 init={{
                                     height: 400,
                                     menubar: true,
