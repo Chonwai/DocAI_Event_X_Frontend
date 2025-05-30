@@ -125,7 +125,12 @@ export default function CreateForm() {
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [previewContent, setPreviewContent] = useState('');
     const [selectedTemplate, setSelectedTemplate] = useState<string>('default');
-
+    const [meta, setMeta] = useState({
+        display: {
+            title: '',
+            description: ''
+        }
+    })
     // 當表單欄位更新時，自動更新可用的變數列表
     useEffect(() => {
         if (emailEnabled) {
@@ -206,6 +211,7 @@ export default function CreateForm() {
             type: 'object',
             title: formTitle,
             description: formDescription,
+            meta: meta,
             properties: {},
             required: []
         };
@@ -276,17 +282,17 @@ export default function CreateForm() {
         jsonSchema.properties = orderedProperties;
 
         // 打印表單數據以便調試
-        console.log('Form Data:', {
-            displayOrder,
-            jsonSchema: {
-                ...jsonSchema,
-                properties: Object.keys(jsonSchema.properties)
-            },
-            uiSchema: {
-                ...uiSchema,
-                'ui:order': uiSchema['ui:order']
-            }
-        });
+        // console.log('Form Data:', {
+        //     displayOrder,
+        //     jsonSchema: {
+        //         ...jsonSchema,
+        //         properties: Object.keys(jsonSchema.properties)
+        //     },
+        //     uiSchema: {
+        //         ...uiSchema,
+        //         'ui:order': uiSchema['ui:order']
+        //     }
+        // });
 
         return { jsonSchema, uiSchema, displayOrder };
     };
@@ -344,6 +350,7 @@ export default function CreateForm() {
                         email_enabled: emailEnabled,
                         is_active: isActive,
                         form_data: formData,
+                        meta: meta,
                         ...(emailEnabled && {
                             email_template_attributes: {
                                 name: emailTemplate.name,
@@ -440,12 +447,70 @@ export default function CreateForm() {
                                     <span className="text-sm">啟用表單</span>
                                 </label>
                             </div>
+                            <input
+                                type="text"
+                                value={meta.display.title}
+                                onChange={(e) => setMeta({
+                                    ...meta,
+                                    display: {
+                                        ...meta.display,
+                                        title: e.target.value
+                                    }
+                                })}
+                                className="w-full text-xl font-bold mb-2 p-2 border rounded"
+                                placeholder="副標題"
+                            />
                             <textarea
                                 value={formDescription}
                                 onChange={(e) => setFormDescription(e.target.value)}
                                 className="w-full p-2 border rounded"
                                 placeholder="表單描述"
                                 rows={3}
+                            />
+                            <p>表單簡介</p>
+                            <Editor
+                                id='description'
+                                apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
+                                value={meta?.display?.description}
+                                init={{
+                                    height: 400,
+                                    menubar: true,
+                                    plugins: [
+                                        'advlist',
+                                        'autolink',
+                                        'lists',
+                                        'link',
+                                        'image',
+                                        'charmap',
+                                        'preview',
+                                        'anchor',
+                                        'searchreplace',
+                                        'visualblocks',
+                                        'code',
+                                        'fullscreen',
+                                        'insertdatetime',
+                                        'media',
+                                        'table',
+                                        'help',
+                                        'wordcount'
+                                    ],
+                                    toolbar:
+                                        'undo redo | formatselect | ' +
+                                        'bold italic backcolor | alignleft aligncenter ' +
+                                        'alignright alignjustify | bullist numlist outdent indent | ' +
+                                        'removeformat | help',
+                                    content_style:
+                                        'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+                                }}
+                                onEditorChange={(content) => {
+                                    setMeta({
+                                        ...meta,
+                                        display: {
+                                            ...meta?.display,
+                                            description: content
+                                        }
+                                    })
+                                }}
                             />
                         </div>
 

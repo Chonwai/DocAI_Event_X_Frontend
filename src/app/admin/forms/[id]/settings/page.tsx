@@ -127,7 +127,12 @@ export default function CreateForm() {
     const [previewContent, setPreviewContent] = useState('');
     const [selectedTemplate, setSelectedTemplate] = useState<string>('default');
     const [loading, setLoading] = useState<boolean>(true);
-
+    const [meta, setMeta] = useState({
+        display: {
+            title: '',
+            description: ''
+        }
+    })
     useEffect(() => {
         fetchFormDataById();
     }, [params]);
@@ -155,6 +160,7 @@ export default function CreateForm() {
         setFormDescription(form.description || '');
         setIsActive(form.is_active || false);
         setEmailEnabled(form.email_enabled || false);
+        setMeta(form.meta)
 
         // 解析 fields，按 display_order 排序
         if (form.json_schema && form.json_schema.properties) {
@@ -412,6 +418,7 @@ export default function CreateForm() {
                         email_enabled: emailEnabled,
                         is_active: isActive,
                         form_data: formData,
+                        meta: meta,
                         ...(emailEnabled && {
                             email_template_attributes: {
                                 name: emailTemplate.name,
@@ -508,12 +515,70 @@ export default function CreateForm() {
                                     <span className="text-sm">啟用表單</span>
                                 </label>
                             </div>
+                            <input
+                                type="text"
+                                value={meta.display.title}
+                                onChange={(e) => setMeta({
+                                    ...meta,
+                                    display: {
+                                        ...meta.display,
+                                        title: e.target.value
+                                    }
+                                })}
+                                className="w-full text-xl font-bold mb-2 p-2 border rounded"
+                                placeholder="副標題"
+                            />
                             <textarea
                                 value={formDescription}
                                 onChange={(e) => setFormDescription(e.target.value)}
                                 className="w-full p-2 border rounded"
                                 placeholder="表單描述"
                                 rows={3}
+                            />
+                            <p>表單簡介</p>
+                            <Editor
+                                id='description'
+                                apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
+                                value={meta?.display?.description}
+                                init={{
+                                    height: 400,
+                                    menubar: true,
+                                    plugins: [
+                                        'advlist',
+                                        'autolink',
+                                        'lists',
+                                        'link',
+                                        'image',
+                                        'charmap',
+                                        'preview',
+                                        'anchor',
+                                        'searchreplace',
+                                        'visualblocks',
+                                        'code',
+                                        'fullscreen',
+                                        'insertdatetime',
+                                        'media',
+                                        'table',
+                                        'help',
+                                        'wordcount'
+                                    ],
+                                    toolbar:
+                                        'undo redo | formatselect | ' +
+                                        'bold italic backcolor | alignleft aligncenter ' +
+                                        'alignright alignjustify | bullist numlist outdent indent | ' +
+                                        'removeformat | help',
+                                    content_style:
+                                        'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+                                }}
+                                onEditorChange={(content) => {
+                                    setMeta({
+                                        ...meta,
+                                        display: {
+                                            ...meta?.display,
+                                            description: content
+                                        }
+                                    })
+                                }}
                             />
                         </div>
 
