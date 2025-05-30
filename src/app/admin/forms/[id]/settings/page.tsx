@@ -156,29 +156,30 @@ export default function CreateForm() {
         setIsActive(form.is_active || false);
         setEmailEnabled(form.email_enabled || false);
 
-        // 解析 fields
+        // 解析 fields，按 display_order 排序
         if (form.json_schema && form.json_schema.properties) {
-            const fields: FormField[] = Object.entries(form.json_schema.properties).map(
-                ([key, value]: [string, any]) => {
-                    // 查找 ui_schema 的 widget
-                    const widget = form.ui_schema?.[key]?.['ui:widget'] || 'text';
-                    return {
-                        title: key,
-                        display_title: value.title || '',
-                        type: value.type || 'string',
-                        required: (form.json_schema.required || []).includes(key),
-                        widget,
-                        options: value.enum
-                            ? value.enum.map((v: string, idx: number) => ({
-                                id: `${key}_opt_${idx}`,
-                                value: v
-                            }))
-                            : undefined,
-                        minimum: value.minimum,
-                        maximum: value.maximum
-                    };
-                }
-            );
+            const properties = form.json_schema.properties;
+            const displayOrder: string[] = form.display_order || Object.keys(properties);
+
+            const fields: FormField[] = displayOrder.map((key: string) => {
+                const value = properties[key];
+                const widget = form.ui_schema?.[key]?.['ui:widget'] || 'text';
+                return {
+                    title: key,
+                    display_title: value?.title || '',
+                    type: value?.type || 'string',
+                    required: (form.json_schema.required || []).includes(key),
+                    widget,
+                    options: value?.enum
+                        ? value?.enum.map((v: string, idx: number) => ({
+                            id: `${key}_opt_${idx}`,
+                            value: v
+                        }))
+                        : undefined,
+                    minimum: value?.minimum,
+                    maximum: value?.maximum
+                };
+            });
             setFields(fields);
         }
 
