@@ -79,7 +79,7 @@ export default function FormDetail() {
     // 自定义文件上传组件
     const CustomFileWidget = (props: WidgetProps) => {
         const { name, required, value, onChange, disabled } = props;
-        console.log('props', props);
+        // console.log('props', props);
         const [loading, setLoading] = useState(false)
 
         const [uploadFiles, setUploadFiles] = useState<File[]>([]);
