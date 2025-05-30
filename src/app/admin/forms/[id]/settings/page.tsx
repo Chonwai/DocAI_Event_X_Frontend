@@ -162,6 +162,142 @@ export default function CreateForm() {
         setEmailEnabled(form.email_enabled || false);
         setMeta(form?.meta)
 
+        //     {
+        // "id": "37b610c7-9daa-4dc6-af54-0317aaa12a5c",
+        // "name": "AI4S TEEN Challenge Series (2024-2025)",
+        // "description": "AI4S TEEN Challenge Series (2024-2025)",
+        // "created_at": "2024-12-16T00:00:00.000Z",
+        // "updated_at": "2024-12-16T00:00:00.000Z",
+        // "json_schema": {
+        //     "type": "object",
+        //     "title": "Competition Registration ⽐賽登記",
+        //     "required": [
+        //         "studentName",
+        //         "countryOfResidence",
+        //         "schoolName",
+        //         "age",
+        //         "email",
+        //         "supervisingTeacher",
+        //         "mainSubjects"
+        //     ],
+        //     "properties": {
+        //         "age": {
+        //             "type": "integer",
+        //             "title": "Age 年齡",
+        //             "maximum": 99,
+        //             "minimum": 1
+        //         },
+        //         "email": {
+        //             "type": "string",
+        //             "title": "Email Address 電郵地址",
+        //             "format": "email"
+        //         },
+        //         "schoolName": {
+        //             "type": "string",
+        //             "title": "School Name 學校名稱"
+        //         },
+        //         "studentName": {
+        //             "type": "string",
+        //             "title": "Student Name 學生姓名"
+        //         },
+        //         "mainSubjects": {
+        //             "type": "array",
+        //             "items": {
+        //                 "enum": [
+        //                     "Mathematics 數學",
+        //                     "Physics 物理",
+        //                     "Chemistry 化學",
+        //                     "Biology 生物",
+        //                     "English 英語",
+        //                     "Chinese 中文",
+        //                     "History 歷史",
+        //                     "Geography 地理",
+        //                     "Computer Science 計算機科學",
+        //                     "Other 其他"
+        //                 ],
+        //                 "type": "string"
+        //             },
+        //             "title": "Main Subject(s) Taught by the Supervising Teacher 指導老師教授的主要科目",
+        //             "uniqueItems": true
+        //         },
+        //         "countryOfResidence": {
+        //             "type": "string",
+        //             "title": "Country of Residence 居住地"
+        //         },
+        //         "supervisingTeacher": {
+        //             "type": "string",
+        //             "title": "Supervising Teacher 指導老師姓名"
+        //         }
+        //     },
+        //     "dependencies": {
+        //         "mainSubjects": {
+        //             "oneOf": [
+        //                 {
+        //                     "required": [
+        //                         "otherMainSubject"
+        //                     ],
+        //                     "properties": {
+        //                         "mainSubjects": {
+        //                             "contains": {
+        //                                 "enum": [
+        //                                     "Other 其他"
+        //                                 ]
+        //                             }
+        //                         },
+        //                         "otherMainSubject": {
+        //                             "type": "string",
+        //                             "title": "Please specify the subject 其他，請具體說明"
+        //                         }
+        //                     }
+        //                 }
+        //             ]
+        //         }
+        //     }
+        // },
+        // "ui_schema": {
+        //     "age": {
+        //         "ui:widget": "updown",
+        //         "ui:placeholder": "e.g., 18"
+        //     },
+        //     "emailAddress": {
+        //         "ui:placeholder": "example@example.com"
+        //     },
+        //     "mainSubjects": {
+        //         "ui:widget": "checkboxes"
+        //     },
+        //     "otherMainSubject": {
+        //         "ui:placeholder": "請輸入具體科目"
+        //     }
+        // },
+        // "form_data": {
+        //     "age": "",
+        //     "email": "",
+        //     "schoolName": "",
+        //     "studentName": "",
+        //     "mainSubjects": [],
+        //     "otherMainSubject": "",
+        //     "countryOfResidence": "",
+        //     "supervisingTeacher": ""
+        // },
+        // "display_order": [
+        //     "studentName",
+        //     "countryOfResidence",
+        //     "schoolName",
+        //     "age",
+        //     "email",
+        //     "supervisingTeacher",
+        //     "mainSubjects"
+        // ],
+        // "is_active": true,
+        // "meta": {
+        //     "display": {
+        //         "title": "AI4S TEEN Challenge Series (2024-2025)",
+        //         "description": "<div><p>Important Dates: </p><ul style=\"list-style-type: disc; margin-left: 20px;\"><li><strong>Registration Period: </strong> December 27, 2024 - January 18, 2025</li><li><strong>Competition Period: </strong> December 27, 2024 - January 18, 2025</li><li><strong>Final Competition Period: </strong> January 20, 2025 - January 26, 2025</li></ul><p><br/>Organized By: </p><ul style=\"list-style-type: disc; margin-left: 20px;\"><li>AI for Science Institute, Beijing (AISI)</li><li>Association d'Intelligence Artificielle France-Chine (AIFC)</li><li>Macau Chinese Association for Artificial Intelligence (MCAAI)</li><li>Asia Artificial Intelligence Alliance (AAIA)</li><li>DP Technology</li></ul><br/><p>For more details, please visit: <a href=\"https://ai4s.mcaai.org\">ai4s.mcaai.org</a> or email <a href=\"mailto:ai4s@mcaai.org\">ai4s@mcaai.org</a></p></div>"
+        //     }
+        // },
+        // "email_enabled": false
+        //     }
+
         // 解析 fields，按 display_order 排序
         if (form.json_schema && form.json_schema.properties) {
             const properties = form.json_schema.properties;
@@ -169,6 +305,21 @@ export default function CreateForm() {
 
             const fields: FormField[] = displayOrder.map((key: string) => {
                 const value = properties[key];
+                // 检查是否为多选（array + enum）
+                if (value?.type === 'array' && value?.items?.enum) {
+                    return {
+                        title: key,
+                        display_title: value?.title || '',
+                        type: 'array',
+                        required: (form.json_schema.required || []).includes(key),
+                        widget: form.ui_schema?.[key]?.['ui:widget'] || 'checkboxes',
+                        options: value.items.enum.map((v: string, idx: number) => ({
+                            id: `${key}_opt_${idx}`,
+                            value: v
+                        }))
+                    };
+                }
+
                 const widget = form.ui_schema?.[key]?.['ui:widget'] || 'text';
                 return {
                     title: key,
