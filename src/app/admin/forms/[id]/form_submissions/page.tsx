@@ -638,7 +638,7 @@ const AdminDashboard: React.FC = () => {
                                             >
                                                 重發Email
                                             </span>
-                                            <span className="mx-2">|</span>
+                                            {/* <span className="mx-2">|</span>
                                             <span
                                                 className="text-red-500 text-sm flex items-center cursor-pointer"
                                                 onClick={() => {
@@ -648,7 +648,7 @@ const AdminDashboard: React.FC = () => {
                                                 }}
                                             >
                                                 <Trash2Icon className="w-4 h-4 ml-1 text-red-500" />
-                                            </span>
+                                            </span> */}
                                         </div>
                                     </td>
                                 </tr>
