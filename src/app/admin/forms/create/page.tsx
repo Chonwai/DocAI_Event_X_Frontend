@@ -186,6 +186,8 @@ export default function CreateForm() {
                 return 'array';
             case 'radio':
                 return 'string';
+            case 'select':
+                return 'string';
             default:
                 return 'string';
         }
@@ -265,6 +267,11 @@ export default function CreateForm() {
                     orderedProperties[fieldId].enum = field.options?.map((opt) => opt.value) || [];
                     uiSchema[fieldId] = {
                         'ui:widget': 'radio'
+                    };
+                } else if (field.widget === 'select') {
+                    orderedProperties[fieldId].enum = field.options?.map((opt) => opt.value) || [];
+                    uiSchema[fieldId] = {
+                        'ui:widget': 'select'
                     };
                 } else if (field.widget) {
                     uiSchema[fieldId] = {
@@ -553,6 +560,7 @@ export default function CreateForm() {
                                     >
                                         <option value="text">文字輸入</option>
                                         <option value="textarea">多行文字</option>
+                                        <option value="select">下拉選項</option>
                                         <option value="number">數字</option>
                                         <option value="date">日期</option>
                                         <option value="time">時間</option>
@@ -563,7 +571,7 @@ export default function CreateForm() {
                                         <option value="file">文件</option>
                                     </select>
 
-                                    {['radio', 'checkboxes'].includes(field.widget || '') && (
+                                    {['radio', 'checkboxes', 'select'].includes(field.widget || '') && (
                                         <div className="space-y-2">
                                             <div className="flex items-center justify-between mb-2">
                                                 <span className="text-sm font-medium">
